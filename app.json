@@ -38,6 +38,23 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      [
+        "expo-sqlite"
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow HoldIt to access your camera",
+          "microphonePermission": "Allow HoldIt to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ],
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "Allow HoldIt to access your contacts."
+        }
       ]
     ],
     "experiments": {
