@@ -1,30 +1,22 @@
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { ClerkLoaded, ClerkProvider, useAuth } from '@clerk/clerk-expo';
+import { tokenCache } from '@clerk/clerk-expo/token-cache';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { ConvexReactClient, useConvexAuth } from 'convex/react';
+import { ConvexProviderWithClerk } from 'convex/react-clerk';
+import { SplashScreen, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, useColorScheme, View } from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import 'react-native-reanimated';
 
 function RootLayoutNav() {
-  const { session, isGuest, isLoading } = useAuth();
-  const segments = useSegments();
-  const router = useRouter();
+  const { isLoading, isAuthenticated } = useConvexAuth();
 
   useEffect(() => {
-    if (isLoading) return;
-
-    const inAuthGroup = segments[0] === 'sign-in';
-    const isAuthenticated = session !== null || isGuest;
-
-    if (!isAuthenticated && !inAuthGroup) {
-      // Redirect to sign-in if not authenticated
-      router.replace('/sign-in');
-    } else if (isAuthenticated && inAuthGroup) {
-      // Redirect to home if already authenticated
-      router.replace('/');
+    if (!isLoading) {
+      SplashScreen.hideAsync();
     }
-  }, [session, isGuest, segments, isLoading, router]);
+  }, [isLoading, isAuthenticated]);
 
   if (isLoading) {
     return (
@@ -37,27 +29,29 @@ function RootLayoutNav() {
   return (
     <Stack screenOptions={{
       headerTransparent: true,
+      headerBackButtonDisplayMode: 'minimal',
     }}>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen
-        name="sign-in"
-        options={{
-          headerShown: false,
-          animation: 'none',
-        }}
-      />
-      <Stack.Screen
-        name="upgrade-account"
-        options={{
-          headerBackButtonDisplayMode: 'minimal',
-          title: '',
+      <Stack.Protected guard={!isAuthenticated}>
+        <Stack.Screen
+          name="sign-in"
+          options={{
+            headerShown: false,
+            animation: 'none',
+          }}
+        />
+      </Stack.Protected>
 
-        }}
+      <Stack.Protected guard={isAuthenticated}>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+      </Stack.Protected>
 
-      />
     </Stack>
   );
 }
+
+const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
+  unsavedChangesWarning: false,
+})
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -65,9 +59,16 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <KeyboardProvider>
-        <AuthProvider>
-          <RootLayoutNav />
-        </AuthProvider>
+        <ClerkProvider
+          tokenCache={tokenCache}
+          publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!}
+        >
+          <ClerkLoaded>
+            <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+              <RootLayoutNav />
+            </ConvexProviderWithClerk>
+          </ClerkLoaded>
+        </ClerkProvider>
       </KeyboardProvider>
     </ThemeProvider>
   );

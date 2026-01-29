@@ -59,7 +59,8 @@
         {
           "contactsPermission": "Allow HoldIt to access your contacts."
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

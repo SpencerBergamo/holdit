@@ -8,11 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		2DC83B737A6AA3C034B7C969 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25C8BD3C8D914FD841CFAB10 /* ExpoModulesProvider.swift */; };
-		35FFE67D3D65DE016B8414C5 /* libPods-holdit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3744D9ACC3169CDBC9C2ABF1 /* libPods-holdit.a */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		49633C275FDA2F9EA72CDFA7 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 5C7F536C2BCEEA01C73F0CE0 /* PrivacyInfo.xcprivacy */; };
+		80038EC8B86AA3850557FCBE /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AC70CF8072EE44AA70750AF /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
+		BC3AAE6A75F4514F4842703A /* libPods-holdit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CD44A9ABA4B563CDBCB2D69 /* libPods-holdit.a */; };
+		CC5CDAA13AF2680DC539B53D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 26114B7E0C53892A245B4DB3 /* PrivacyInfo.xcprivacy */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
@@ -20,13 +20,13 @@
 		13B07F961A680F5B00A75B9A /* holdit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = holdit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = holdit/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = holdit/Info.plist; sourceTree = "<group>"; };
-		19CA684EC29555EB3DFD48A1 /* Pods-holdit.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-holdit.debug.xcconfig"; path = "Target Support Files/Pods-holdit/Pods-holdit.debug.xcconfig"; sourceTree = "<group>"; };
-		25C8BD3C8D914FD841CFAB10 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-holdit/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		3744D9ACC3169CDBC9C2ABF1 /* libPods-holdit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-holdit.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		5C7F536C2BCEEA01C73F0CE0 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = holdit/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		6AF1443AF35211962C9FABB4 /* Pods-holdit.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-holdit.release.xcconfig"; path = "Target Support Files/Pods-holdit/Pods-holdit.release.xcconfig"; sourceTree = "<group>"; };
+		26114B7E0C53892A245B4DB3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = holdit/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		2AC70CF8072EE44AA70750AF /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-holdit/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		3AC1A6D2C799C0F349DED733 /* Pods-holdit.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-holdit.release.xcconfig"; path = "Target Support Files/Pods-holdit/Pods-holdit.release.xcconfig"; sourceTree = "<group>"; };
+		4CD44A9ABA4B563CDBCB2D69 /* libPods-holdit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-holdit.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = holdit/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
+		E73F5D092606A55657874A87 /* Pods-holdit.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-holdit.debug.xcconfig"; path = "Target Support Files/Pods-holdit/Pods-holdit.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = holdit/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* holdit-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "holdit-Bridging-Header.h"; path = "holdit/holdit-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -37,13 +37,23 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				35FFE67D3D65DE016B8414C5 /* libPods-holdit.a in Frameworks */,
+				BC3AAE6A75F4514F4842703A /* libPods-holdit.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0DB1FEE1B528CD9816DD6E93 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				E73F5D092606A55657874A87 /* Pods-holdit.debug.xcconfig */,
+				3AC1A6D2C799C0F349DED733 /* Pods-holdit.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		13B07FAE1A68108700A75B9A /* holdit */ = {
 			isa = PBXGroup;
 			children = (
@@ -53,28 +63,34 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				5C7F536C2BCEEA01C73F0CE0 /* PrivacyInfo.xcprivacy */,
+				26114B7E0C53892A245B4DB3 /* PrivacyInfo.xcprivacy */,
 			);
 			name = holdit;
-			sourceTree = "<group>";
-		};
-		24A2249A4C9A391715E88940 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				19CA684EC29555EB3DFD48A1 /* Pods-holdit.debug.xcconfig */,
-				6AF1443AF35211962C9FABB4 /* Pods-holdit.release.xcconfig */,
-			);
-			name = Pods;
-			path = Pods;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				3744D9ACC3169CDBC9C2ABF1 /* libPods-holdit.a */,
+				4CD44A9ABA4B563CDBCB2D69 /* libPods-holdit.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		5FAAD3E8F3C34A17CB80BC8E /* holdit */ = {
+			isa = PBXGroup;
+			children = (
+				2AC70CF8072EE44AA70750AF /* ExpoModulesProvider.swift */,
+			);
+			name = holdit;
+			sourceTree = "<group>";
+		};
+		6527B2DA838A18FDCB9B5875 /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				5FAAD3E8F3C34A17CB80BC8E /* holdit */,
+			);
+			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -91,8 +107,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				24A2249A4C9A391715E88940 /* Pods */,
-				E01BA0BF4D4339B561597BEA /* ExpoModulesProviders */,
+				0DB1FEE1B528CD9816DD6E93 /* Pods */,
+				6527B2DA838A18FDCB9B5875 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -107,14 +123,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		BA9B0DD2E341C6B7B89C16EF /* holdit */ = {
-			isa = PBXGroup;
-			children = (
-				25C8BD3C8D914FD841CFAB10 /* ExpoModulesProvider.swift */,
-			);
-			name = holdit;
-			sourceTree = "<group>";
-		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
 			isa = PBXGroup;
 			children = (
@@ -122,14 +130,6 @@
 			);
 			name = Supporting;
 			path = holdit/Supporting;
-			sourceTree = "<group>";
-		};
-		E01BA0BF4D4339B561597BEA /* ExpoModulesProviders */ = {
-			isa = PBXGroup;
-			children = (
-				BA9B0DD2E341C6B7B89C16EF /* holdit */,
-			);
-			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -140,13 +140,13 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "holdit" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				C82C1318956D8566D75FFE28 /* [Expo] Configure project */,
+				DFCB7EB8601BE475C023A994 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				4D613D83516D92EEF1421609 /* [CP] Embed Pods Frameworks */,
+				C52B9590940C3D83F675CA06 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -196,7 +196,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				49633C275FDA2F9EA72CDFA7 /* PrivacyInfo.xcprivacy in Resources */,
+				CC5CDAA13AF2680DC539B53D /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -242,28 +242,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		4D613D83516D92EEF1421609 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-holdit/Pods-holdit-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/React-Core-prebuilt/React.framework/React",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ReactNativeDependencies/ReactNativeDependencies.framework/ReactNativeDependencies",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/React.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ReactNativeDependencies.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-holdit/Pods-holdit-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -300,7 +278,29 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-holdit/Pods-holdit-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C82C1318956D8566D75FFE28 /* [Expo] Configure project */ = {
+		C52B9590940C3D83F675CA06 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-holdit/Pods-holdit-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/React-Core-prebuilt/React.framework/React",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ReactNativeDependencies/ReactNativeDependencies.framework/ReactNativeDependencies",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/React.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ReactNativeDependencies.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-holdit/Pods-holdit-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DFCB7EB8601BE475C023A994 /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -332,7 +332,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				2DC83B737A6AA3C034B7C969 /* ExpoModulesProvider.swift in Sources */,
+				80038EC8B86AA3850557FCBE /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -341,7 +341,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 19CA684EC29555EB3DFD48A1 /* Pods-holdit.debug.xcconfig */;
+			baseConfigurationReference = E73F5D092606A55657874A87 /* Pods-holdit.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -377,7 +377,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6AF1443AF35211962C9FABB4 /* Pods-holdit.release.xcconfig */;
+			baseConfigurationReference = 3AC1A6D2C799C0F349DED733 /* Pods-holdit.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
