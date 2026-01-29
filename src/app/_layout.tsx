@@ -1,7 +1,9 @@
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, useColorScheme, View } from 'react-native';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import 'react-native-reanimated';
 
 function RootLayoutNav() {
@@ -33,31 +35,41 @@ function RootLayoutNav() {
   }
 
   return (
-    <Stack>
+    <Stack screenOptions={{
+      headerTransparent: true,
+    }}>
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen 
-        name="sign-in" 
-        options={{ 
+      <Stack.Screen
+        name="sign-in"
+        options={{
           headerShown: false,
           animation: 'none',
-        }} 
+        }}
       />
-      <Stack.Screen 
-        name="upgrade-account" 
-        options={{ 
-          headerShown: false,
-          presentation: 'card',
-        }} 
+      <Stack.Screen
+        name="upgrade-account"
+        options={{
+          headerBackButtonDisplayMode: 'minimal',
+          title: '',
+
+        }}
+
       />
     </Stack>
   );
 }
 
 export default function RootLayout() {
+  const colorScheme = useColorScheme();
+
   return (
-    <AuthProvider>
-      <RootLayoutNav />
-    </AuthProvider>
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <KeyboardProvider>
+        <AuthProvider>
+          <RootLayoutNav />
+        </AuthProvider>
+      </KeyboardProvider>
+    </ThemeProvider>
   );
 }
 

@@ -1,31 +1,32 @@
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  KeyboardAvoidingView,
   Platform,
-  ScrollView,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
+  View
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function UpgradeAccount() {
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const { colors } = useTheme();
+
+  const { upgradeGuestAccount, isGuest } = useAuth();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const { upgradeGuestAccount, isGuest } = useAuth();
-  const { width } = useWindowDimensions();
-  const isLargeScreen = width > 768;
 
-  // Redirect if not a guest
   if (!isGuest) {
     router.replace('/');
     return null;
@@ -73,87 +74,70 @@ export default function UpgradeAccount() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+    <KeyboardAwareScrollView
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={{ flex: 1, paddingHorizontal: 16, paddingTop: insets.top, backgroundColor: colors.background }}
+      bottomOffset={40}
     >
-      <ScrollView
-        contentContainerStyle={[
-          styles.scrollContent,
-          isLargeScreen && styles.scrollContentLarge,
-        ]}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={[
-          styles.content,
-          isLargeScreen && styles.contentLarge,
-        ]}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <Text style={styles.backButtonText}>← Back</Text>
-          </TouchableOpacity>
+      <SafeAreaView>
+        <Text style={[styles.title, { color: colors.text }]}>Upgrade Your Account</Text>
+        <Text style={[styles.subtitle, { color: colors.text }]}>
+          Keep all your progress and unlock full features
+        </Text>
 
-          <Text style={styles.title}>Upgrade Your Account</Text>
-          <Text style={styles.subtitle}>
-            Keep all your progress and unlock full features
-          </Text>
-
-          <View style={styles.infoBox}>
-            <Text style={styles.infoText}>
-              ✓ All your guest data will be preserved{'\n'}
-              ✓ Sync across devices{'\n'}
-              ✓ Unlock all premium features
-            </Text>
-          </View>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            editable={!loading}
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            editable={!loading}
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-            editable={!loading}
-          />
-
-          <TouchableOpacity
-            style={[styles.button, styles.primaryButton]}
-            onPress={handleUpgrade}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Upgrade Account</Text>
-            )}
-          </TouchableOpacity>
-
-          <Text style={styles.note}>
-            By upgrading, you agree to receive a verification email
+        <View style={[styles.infoBox, { backgroundColor: colors.card }]}>
+          <Text style={[styles.infoText, { color: colors.text }]}>
+            ✓ All your guest data will be preserved{'\n'}
+            ✓ Sync across devices{'\n'}
+            ✓ Unlock all premium features
           </Text>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+
+        <TextInput
+          style={[styles.input, { color: colors.text, borderColor: colors.border }]}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          editable={!loading}
+        />
+
+        <TextInput
+          style={[styles.input, { color: colors.text, borderColor: colors.border }]}
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          editable={!loading}
+        />
+
+        <TextInput
+          style={[styles.input, { color: colors.text, borderColor: colors.border }]}
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry
+          editable={!loading}
+        />
+
+        <Pressable
+          style={[styles.button, { backgroundColor: colors.primary }]}
+          onPress={handleUpgrade}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={[styles.buttonText, { color: colors.background }]}>Upgrade Account</Text>
+          )}
+        </Pressable>
+
+        <Text style={[styles.note, { color: colors.text }]}>
+          By upgrading, you agree to receive a verification email
+        </Text>
+      </SafeAreaView>
+    </KeyboardAwareScrollView>
   );
 }
 
@@ -161,16 +145,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: Platform.OS === 'web' ? 32 : 24,
-    paddingTop: Platform.OS === 'web' ? 64 : 24,
-    paddingBottom: Platform.OS === 'web' ? 64 : 24,
-  },
-  scrollContentLarge: {
-    alignItems: 'center',
+    paddingHorizontal: 16,
   },
   content: {
     width: '100%',
@@ -179,40 +154,20 @@ const styles = StyleSheet.create({
   contentLarge: {
     maxWidth: 480,
   },
-  backButton: {
-    marginBottom: 16,
-    alignSelf: 'flex-start',
-  },
-  backButtonText: {
-    fontSize: 16,
-    color: '#007AFF',
-    fontWeight: '600',
-  },
   title: {
-    fontSize: Platform.OS === 'web' ? 36 : 32,
+    fontSize: 32,
     fontWeight: 'bold',
     marginBottom: 8,
     textAlign: 'center',
-    ...Platform.select({
-      web: {
-        userSelect: 'none',
-      },
-    }),
   },
   subtitle: {
-    fontSize: Platform.OS === 'web' ? 18 : 16,
+    fontSize: 16,
     color: '#666',
     marginBottom: 24,
     textAlign: 'center',
     lineHeight: 24,
-    ...Platform.select({
-      web: {
-        userSelect: 'none',
-      },
-    }),
   },
   infoBox: {
-    backgroundColor: '#E8F5E9',
     padding: 16,
     borderRadius: 12,
     marginBottom: 24,
@@ -243,18 +198,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     minHeight: 52,
     justifyContent: 'center',
-    ...Platform.select({
-      web: {
-        cursor: 'pointer',
-        transition: 'opacity 0.2s',
-      },
-    }),
-  },
-  primaryButton: {
-    backgroundColor: '#007AFF',
   },
   buttonText: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },

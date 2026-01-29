@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bergamospencer.holdit"
     },
     "android": {
       "adaptiveIcon": {
@@ -25,11 +26,8 @@
         "android.permission.RECORD_AUDIO",
         "android.permission.READ_CONTACTS",
         "android.permission.WRITE_CONTACTS"
-      ]
-    },
-    "web": {
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      ],
+      "package": "com.bergamospencer.holdit"
     },
     "plugins": [
       "expo-router",

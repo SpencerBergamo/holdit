@@ -37,44 +37,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session
-    const initializeAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setSession(session);
-        setUser(session?.user ?? null);
+    // Use only onAuthStateChange to avoid race conditions with storage locks
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      // Update guest status
+      if (session?.user?.is_anonymous) {
+        setIsGuest(true);
+      } else if (session?.user) {
+        setIsGuest(false);
+      } else {
+        setIsGuest(false);
+      }
 
-        // Check if user is anonymous (guest)
-        if (session?.user?.is_anonymous) {
-          setIsGuest(true);
-        }
-      } catch (error) {
-        console.error('Error initializing auth:', error);
-      } finally {
+      // Mark loading complete on initial session
+      if (event === 'INITIAL_SESSION') {
         setIsLoading(false);
       }
-    };
-
-    initializeAuth();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-
-        // Update guest status based on anonymous flag
-        if (session?.user?.is_anonymous) {
-          setIsGuest(true);
-        } else if (session?.user) {
-          // User has upgraded or signed in with full account
-          setIsGuest(false);
-        } else {
-          // No session
-          setIsGuest(false);
-        }
-      }
-    );
+    });
 
     return () => {
       subscription.unsubscribe();

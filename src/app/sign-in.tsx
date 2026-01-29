@@ -5,16 +5,16 @@ import { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  KeyboardAvoidingView,
   Platform,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   useWindowDimensions,
-  View,
+  View
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -93,17 +93,12 @@ export default function SignIn() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+    <KeyboardAwareScrollView
+      bottomOffset={40}
+      keyboardShouldPersistTaps="handled"
     >
-      <ScrollView
-        contentContainerStyle={[
-          styles.scrollContent,
-          isLargeScreen && styles.scrollContentLarge,
-        ]}
-        keyboardShouldPersistTaps="handled"
-      >
+      <SafeAreaView style={{ flex: 1, paddingHorizontal: 16 }}>
+
         <View style={[
           styles.content,
           isLargeScreen && styles.contentLarge,
@@ -168,8 +163,8 @@ export default function SignIn() {
             Note: Guest mode has limited features and data won&apos;t be synced
           </Text>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </SafeAreaView>
+    </KeyboardAwareScrollView>
   );
 }
 
