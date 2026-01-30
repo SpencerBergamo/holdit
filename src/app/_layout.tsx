@@ -1,11 +1,10 @@
 import { ClerkLoaded, ClerkProvider, useAuth } from '@clerk/clerk-expo';
 import { tokenCache } from '@clerk/clerk-expo/token-cache';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { ConvexReactClient, useConvexAuth } from 'convex/react';
 import { ConvexProviderWithClerk } from 'convex/react-clerk';
 import { SplashScreen, Stack } from 'expo-router';
 import { useEffect } from 'react';
-import { ActivityIndicator, StyleSheet, useColorScheme, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import 'react-native-reanimated';
 
@@ -54,23 +53,20 @@ const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
 })
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <KeyboardProvider>
-        <ClerkProvider
-          tokenCache={tokenCache}
-          publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!}
-        >
-          <ClerkLoaded>
-            <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-              <RootLayoutNav />
-            </ConvexProviderWithClerk>
-          </ClerkLoaded>
-        </ClerkProvider>
-      </KeyboardProvider>
-    </ThemeProvider>
+    <KeyboardProvider>
+      <ClerkProvider
+        tokenCache={tokenCache}
+        publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!}
+      >
+        <ClerkLoaded>
+          <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+            <RootLayoutNav />
+          </ConvexProviderWithClerk>
+        </ClerkLoaded>
+      </ClerkProvider>
+    </KeyboardProvider>
   );
 }
 

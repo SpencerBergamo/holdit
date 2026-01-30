@@ -1,4 +1,4 @@
-import { useTheme } from "@react-navigation/native";
+import { useTheme } from "@/constants/theme";
 import { Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -19,7 +19,7 @@ export default function NewCollectionScreen() {
 
 
     return (
-        <View style={{ flex: 1, backgroundColor: colors.background, paddingTop: insets.top }}>
+        <View style={{ flex: 1, backgroundColor: colors.bg, paddingTop: insets.top }}>
 
             <Text>New Collection</Text>
 

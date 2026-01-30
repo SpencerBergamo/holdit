@@ -1,0 +1,33 @@
+
+import { MaterialIcons } from '@expo/vector-icons';
+import { SFSymbol, SymbolView } from 'expo-symbols';
+import { Platform } from 'react-native';
+
+type IconName = { ios: SFSymbol; android: string }
+
+interface PlatformIconProps {
+    name: IconName[keyof IconName];
+    size?: number;
+    color?: string;
+}
+
+const iconMap: Record<string, { ios: SFSymbol; android: keyof typeof MaterialIcons.glyphMap }> = {
+    profile: { ios: 'person', android: 'person' },
+    eye: { ios: 'eye', android: 'visibility' },
+    eyeOff: { ios: 'eye.slash', android: 'visibility-off' },
+    menu: { ios: 'info.circle', android: 'menu' },
+    download: { ios: 'square.and.arrow.down', android: 'download' },
+    share: { ios: 'square.and.arrow.up', android: 'share' },
+    plus: { ios: 'plus', android: 'add' },
+    compose: { ios: 'square.and.pencil', android: 'create' },
+}
+
+export default function PlatformIcon({ name, size = 24, color = '#000' }: PlatformIconProps) {
+    const mapped = iconMap[name];
+
+    if (Platform.OS === 'ios') {
+        return <SymbolView name={mapped.ios} size={size} />;
+    }
+
+    return <MaterialIcons name={mapped.android} size={size} color={color} />;
+}

@@ -1,11 +1,9 @@
-import { useAuth } from '@/contexts/AuthContext';
-import { useTheme } from '@react-navigation/native';
+import { useTheme } from '@/constants/theme';
 import { useRouter } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import {
   Alert,
   Button,
-  FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -21,11 +19,8 @@ type Collection = {
 
 export default function HomeScreen() {
   const router = useRouter();
+  // const { colors } = useTheme();
   const { colors } = useTheme();
-
-  const { user, isGuest, signOut } = useAuth();
-  const [collections, setCollections] = useState<Collection[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   const handleUpgradeAccount = () => {
     router.push('/upgrade-account');
@@ -41,8 +36,8 @@ export default function HomeScreen() {
           text: 'Sign Out',
           style: 'destructive',
           onPress: async () => {
-            await signOut();
-            router.replace('/sign-in');
+            // router.replace('/sign-in');
+
           },
         },
       ]
@@ -50,22 +45,12 @@ export default function HomeScreen() {
   };
 
   const handleNewCollection = useCallback(async (collectionName: string) => {
-    if (!user) {
-      Alert.alert('Error', 'You must be signed in to create a collection');
-      return;
-    }
 
-    try {
-      Alert.alert('Success', `Collection "${collectionName}" created successfully!`);
-    } catch (error) {
-      console.error('Unexpected error creating collection:', error);
-      Alert.alert('Error', 'An unexpected error occurred');
-    }
-  }, [user]);
+  }, []);
 
   const renderCollectionItem = ({ item }: { item: Collection }) => (
     <TouchableOpacity
-      style={[styles.collectionItem, { backgroundColor: colors.card, borderColor: colors.border }]}
+      style={[styles.collectionItem, { borderColor: colors.border }]}
       onPress={() => {
         // TODO: Navigate to collection detail
         console.log('Collection selected:', item.id);
@@ -79,7 +64,7 @@ export default function HomeScreen() {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: colors.bg }]}>
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>My Collections</Text>
         <Button
@@ -99,24 +84,7 @@ export default function HomeScreen() {
         />
       </View>
 
-      {isLoading ? (
-        <View style={styles.centerContent}>
-          <Text style={{ color: colors.text }}>Loading...</Text>
-        </View>
-      ) : collections.length === 0 ? (
-        <View style={styles.centerContent}>
-          <Text style={[styles.emptyText, { color: colors.text + '80' }]}>
-            No collections yet. Create one to get started!
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={collections}
-          renderItem={renderCollectionItem}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={styles.listContent}
-        />
-      )}
+
     </View>
   );
 }

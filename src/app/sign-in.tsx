@@ -1,16 +1,14 @@
-import { useAuth } from '@/contexts/AuthContext';
-import { useTheme } from '@react-navigation/native';
+import PlatformIcon from '@/components/PlatformIcon';
+import { useTheme } from '@/constants/theme';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useRef, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
   ActivityIndicator,
-  Alert,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
-  useWindowDimensions,
   View
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
@@ -22,138 +20,118 @@ interface FormData {
 }
 
 export default function SignIn() {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
 
-  const { control, handleSubmit } = useForm<FormData>({
-
+  const { control,
+    handleSubmit,
+    formState: { errors, isValid }
+  } = useForm<FormData>({
+    mode: "onChange",
   });
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const emailRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const { continueAsGuest } = useAuth();
-  const { width } = useWindowDimensions();
-  const isLargeScreen = width > 768;
 
-  const handleSignIn = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please enter both email and password');
-      return;
-    }
+  async function handleSignIn(data: FormData) {
 
-    setLoading(true);
-    try {
-      // TODO: Implement with Convex
-      console.log('Sign in:', email);
-      Alert.alert('Info', 'Sign in will be implemented with Convex');
-    } catch {
-      Alert.alert('Error', 'An unexpected error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignUp = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please enter both email and password');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // TODO: Implement with Convex
-      console.log('Sign up:', email);
-      Alert.alert('Info', 'Account creation will be implemented with Convex');
-    } catch {
-      Alert.alert('Error', 'An unexpected error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleContinueAsGuest = async () => {
-    setLoading(true);
-    try {
-      await continueAsGuest();
-      router.replace('/');
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to continue as guest';
-      Alert.alert('Error', message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }
 
   return (
     <KeyboardAwareScrollView
       bottomOffset={40}
       keyboardShouldPersistTaps="handled"
-      contentContainerStyle={{ flex: 1, paddingHorizontal: 16, paddingTop: insets.top, backgroundColor: colors.background }}
+      contentContainerStyle={{ flex: 1, paddingHorizontal: 16, paddingTop: insets.top, backgroundColor: colors.bg }}
     >
       <SafeAreaView style={{ flex: 1, paddingHorizontal: 16 }}>
-
-
         <Text style={styles.title}>Welcome to HoldIt</Text>
         <Text style={styles.subtitle}>Sign in to sync your data across devices</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          editable={!loading}
+        <Controller
+          control={control}
+          name="email"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              ref={emailRef}
+              autoFocus
+              style={styles.input}
+              placeholder="Email"
+              value={value}
+              onChangeText={onChange}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              editable={!loading}
+              onBlur={onBlur}
+              onSubmitEditing={() => passwordRef.current?.focus()}
+              returnKeyType='next'
+              returnKeyLabel='next'
+            />
+          )}
         />
+        <View style={styles.errorTextView}>
+          <Text style={{ color: '#FF3B30' }}>{errors.email?.message}</Text>
+        </View>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          editable={!loading}
-        />
+        <View style={{ position: 'relative' }}>
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                ref={passwordRef}
+                style={styles.input}
+                placeholder="Password"
+                value={value}
+                onChangeText={onChange}
+                secureTextEntry={!isPasswordVisible}
+                editable={!loading}
+                autoComplete='current-password'
+                spellCheck={false}
+                placeholderTextColor={colors.border}
+                onBlur={onBlur}
+                onSubmitEditing={handleSubmit(handleSignIn)}
+              />
+            )} />
 
-        <TouchableOpacity
+          <View style={{ position: 'absolute', right: 12, top: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}>
+            {isPasswordVisible ? (
+              <Pressable>
+                <PlatformIcon name="eye" size={20} color={colors.text} />
+              </Pressable>
+            ) : (
+              <Pressable>
+                <PlatformIcon name="eyeOff" size={20} color={colors.text} />
+              </Pressable>
+            )}
+          </View>
+        </View>
+        <View style={styles.errorTextView}>
+          <Text style={{ color: '#FF3B30' }}>{errors.password?.message}</Text>
+        </View>
+
+        <Pressable
           style={[styles.button, styles.primaryButton]}
-          onPress={handleSignIn}
-          disabled={loading}
+          onPress={handleSubmit(handleSignIn)}
+          disabled={loading || !isValid}
         >
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
             <Text style={styles.buttonText}>Sign In</Text>
           )}
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity
-          style={[styles.button, styles.secondaryButton]}
-          onPress={handleSignUp}
-          disabled={loading}
-        >
-          <Text style={styles.secondaryButtonText}>Create Account</Text>
-        </TouchableOpacity>
+
+        {/* Social OAuth Buttons */}
 
         <View style={styles.divider}>
           <View style={styles.dividerLine} />
           <Text style={styles.dividerText}>OR</Text>
           <View style={styles.dividerLine} />
         </View>
-
-        <TouchableOpacity
-          style={[styles.button, styles.guestButton]}
-          onPress={handleContinueAsGuest}
-          disabled={loading}
-        >
-          <Text style={styles.guestButtonText}>Continue as Guest</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.guestNote}>
-          Note: Guest mode has limited features and data won&apos;t be synced
-        </Text>
 
       </SafeAreaView>
     </KeyboardAwareScrollView>
@@ -203,6 +181,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 16,
     minHeight: 48,
+  },
+  errorTextView: {
+    flex: 1,
+    height: 21,
+    justifyContent: 'center',
+    paddingHorizontal: 8,
   },
   button: {
     padding: 16,
