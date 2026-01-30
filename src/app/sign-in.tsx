@@ -1,10 +1,13 @@
 import PlatformIcon from '@/components/PlatformIcon';
 import { useTheme } from '@/constants/theme';
+import { useSignIn } from '@clerk/clerk-expo';
+import type { EmailCodeFactor } from '@clerk/types';
 import { useRouter } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   ActivityIndicator,
+  Alert,
   Pressable,
   StyleSheet,
   Text,
@@ -23,6 +26,7 @@ export default function SignIn() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
+  const { isLoaded, signIn, setActive } = useSignIn();
 
   const { control,
     handleSubmit,
@@ -36,105 +40,242 @@ export default function SignIn() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Second Factor Verification
+  const [showEmailCodeVerification, setShowEmailCodeVerification] = useState(false);
+  const [emailCode, setEmailCode] = useState('');
+
   async function handleSignIn(data: FormData) {
+    console.log('handleSignIn', data);
+    if (!isLoaded) return;
+
+    try {
+      const signInAttempt = await signIn.create({
+        identifier: data.email,
+        password: data.password,
+      });
+
+      if (signInAttempt.status === 'complete') {
+        await setActive({
+          session: signInAttempt.createdSessionId,
+          navigate: async ({ session }) => {
+            if (session?.currentTask) {
+              console.log(session?.currentTask);
+              return;
+            }
+
+            router.replace('/');
+          }
+        });
+      } else if (signInAttempt.status === 'needs_second_factor') {
+        const emailCodeFactor = signInAttempt.supportedSecondFactors?.find(
+          (factor): factor is EmailCodeFactor => factor.strategy === 'email_code',
+        )
+
+        if (emailCodeFactor) {
+          await signIn.prepareSecondFactor({
+            strategy: 'email_code',
+            emailAddressId: emailCodeFactor.emailAddressId,
+          });
+
+          setShowEmailCodeVerification(true);
+        }
+      } else {
+        console.warn(JSON.stringify(signInAttempt, null, 2));
+        throw new Error('Failed to sign in');
+      }
+    } catch (e) {
+      console.error('Sign-in error:', e);
+      Alert.alert('Error', 'Failed to sign in');
+    }
 
   }
 
+  const handleVerifyEmailCode = useCallback(async () => {
+    if (!isLoaded) return;
+
+    try {
+      const signInAttempt = await signIn.attemptSecondFactor({
+        strategy: 'email_code',
+        code: emailCode,
+      });
+
+      if (signInAttempt.status === 'complete') {
+        await setActive({
+          session: signInAttempt.createdSessionId,
+          navigate: async ({ session }) => {
+            if (session?.currentTask) {
+              console.log(session?.currentTask);
+            }
+          }
+        });
+      } else {
+        console.warn(JSON.stringify(signInAttempt, null, 2));
+      }
+    } catch (e) {
+      console.error('Verification error:', e);
+      Alert.alert('Error', 'Failed to verify email code');
+    }
+  }, [emailCode, signIn, setActive, router, isLoaded]);
+
+  if (showEmailCodeVerification) {
+    return (
+      <KeyboardAwareScrollView
+        bottomOffset={40}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingTop: insets.top }}
+      >
+
+        <SafeAreaView style={{ paddingHorizontal: 16 }}>
+
+          <Text style={styles.title}>Verify your email</Text>
+          <Text style={styles.subtitle}>We sent a verification code to your email</Text>
+
+          <TextInput
+            autoFocus
+            style={styles.input}
+            placeholder="Verification code"
+            value={emailCode}
+            onChangeText={setEmailCode}
+            keyboardType="number-pad"
+            editable={!loading}
+            onSubmitEditing={handleVerifyEmailCode}
+          />
+
+          <Pressable
+            style={styles.button}
+            onPress={handleVerifyEmailCode}
+            disabled={loading || emailCode.length === 0}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Verify Email</Text>
+            )}
+          </Pressable>
+
+          <Pressable
+            style={styles.button}
+            onPress={() => setShowEmailCodeVerification(false)}
+          >
+            <Text style={styles.buttonText}>Cancel</Text>
+          </Pressable>
+        </SafeAreaView>
+
+      </KeyboardAwareScrollView>
+    );
+  }
+
   return (
-    <KeyboardAwareScrollView
-      bottomOffset={40}
-      keyboardShouldPersistTaps="handled"
-      contentContainerStyle={{ flex: 1, paddingHorizontal: 16, paddingTop: insets.top, backgroundColor: colors.bg }}
-    >
-      <SafeAreaView style={{ flex: 1, paddingHorizontal: 16 }}>
-        <Text style={styles.title}>Welcome to HoldIt</Text>
-        <Text style={styles.subtitle}>Sign in to sync your data across devices</Text>
+    <View style={{ flex: 1, backgroundColor: colors.bg }}>
 
-        <Controller
-          control={control}
-          name="email"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              ref={emailRef}
-              autoFocus
-              style={styles.input}
-              placeholder="Email"
-              value={value}
-              onChangeText={onChange}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              editable={!loading}
-              onBlur={onBlur}
-              onSubmitEditing={() => passwordRef.current?.focus()}
-              returnKeyType='next'
-              returnKeyLabel='next'
-            />
-          )}
-        />
-        <View style={styles.errorTextView}>
-          <Text style={{ color: '#FF3B30' }}>{errors.email?.message}</Text>
-        </View>
+      <KeyboardAwareScrollView
+        bottomOffset={40}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingTop: insets.top }}
+      >
+        <SafeAreaView style={{ paddingHorizontal: 16 }}>
+          <Text style={styles.title}>Welcome to HoldIt</Text>
+          <Text style={styles.subtitle}>Sign in to sync your data across devices</Text>
 
-        <View style={{ position: 'relative' }}>
           <Controller
             control={control}
-            name="password"
+            name="email"
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                ref={passwordRef}
+                ref={emailRef}
+                autoFocus
                 style={styles.input}
-                placeholder="Password"
+                placeholder="Email"
                 value={value}
                 onChangeText={onChange}
-                secureTextEntry={!isPasswordVisible}
+                autoCapitalize="none"
+                keyboardType="email-address"
                 editable={!loading}
-                autoComplete='current-password'
-                spellCheck={false}
-                placeholderTextColor={colors.border}
                 onBlur={onBlur}
-                onSubmitEditing={handleSubmit(handleSignIn)}
+                onSubmitEditing={() => passwordRef.current?.focus()}
+                returnKeyType='next'
+                returnKeyLabel='next'
               />
-            )} />
-
-          <View style={{ position: 'absolute', right: 12, top: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}>
-            {isPasswordVisible ? (
-              <Pressable>
-                <PlatformIcon name="eye" size={20} color={colors.text} />
-              </Pressable>
-            ) : (
-              <Pressable>
-                <PlatformIcon name="eyeOff" size={20} color={colors.text} />
-              </Pressable>
             )}
-          </View>
-        </View>
-        <View style={styles.errorTextView}>
-          <Text style={{ color: '#FF3B30' }}>{errors.password?.message}</Text>
-        </View>
-
-        <Pressable
-          style={[styles.button, styles.primaryButton]}
-          onPress={handleSubmit(handleSignIn)}
-          disabled={loading || !isValid}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Sign In</Text>
+          />
+          {errors.email && (
+            <View style={styles.errorTextView}>
+              <Text style={{ color: '#FF3B30' }}>{errors.email?.message}</Text>
+            </View>
           )}
-        </Pressable>
+
+          <View style={{ position: 'relative' }}>
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  ref={passwordRef}
+                  style={[styles.input, { marginBottom: 0 }]}
+                  placeholder="Password"
+                  value={value}
+                  onChangeText={onChange}
+                  secureTextEntry={!isPasswordVisible}
+                  editable={!loading}
+                  autoComplete='current-password'
+                  spellCheck={false}
+                  placeholderTextColor={colors.border}
+                  onBlur={onBlur}
+                  onSubmitEditing={handleSubmit(handleSignIn)}
+                />
+              )} />
+
+            <Pressable
+              style={{ position: 'absolute', right: 12, top: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}
+              onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+            >
+              <PlatformIcon
+                name={isPasswordVisible ? 'eye' : 'eyeOff'}
+                size={20}
+                color={colors.text}
+              />
+            </Pressable>
+          </View>
+          {errors.password && (
+            <View style={styles.errorTextView}>
+              <Text style={{ color: '#FF3B30' }}>{errors.password?.message}</Text>
+            </View>
+          )}
+
+          <View style={{ marginBottom: 16 }} />
+
+          <Pressable
+            style={[styles.button, styles.primaryButton]}
+            onPress={handleSubmit(handleSignIn)}
+            disabled={loading || !isValid}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Sign In</Text>
+            )}
+          </Pressable>
 
 
-        {/* Social OAuth Buttons */}
+          {/* Social OAuth Buttons */}
 
-        <View style={styles.divider}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>OR</Text>
-          <View style={styles.dividerLine} />
-        </View>
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>OR</Text>
+            <View style={styles.dividerLine} />
+          </View>
 
-      </SafeAreaView>
-    </KeyboardAwareScrollView>
+          <Pressable
+            style={[styles.button, styles.secondaryButton]}
+            onPress={() => router.push('/sign-up')}
+            disabled={loading}
+          >
+            <Text style={styles.secondaryButtonText}>Create Account</Text>
+          </Pressable>
+
+        </SafeAreaView>
+      </KeyboardAwareScrollView>
+    </View>
   );
 }
 
@@ -183,10 +324,10 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   errorTextView: {
-    flex: 1,
-    height: 21,
+    minHeight: 21,
     justifyContent: 'center',
     paddingHorizontal: 8,
+    marginBottom: 8,
   },
   button: {
     padding: 16,

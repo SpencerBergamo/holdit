@@ -32,9 +32,16 @@ function RootLayoutNav() {
     }}>
       <Stack.Protected guard={!isAuthenticated}>
         <Stack.Screen
+          name="sign-up"
+          options={{
+            headerTitle: '',
+            animation: 'default',
+          }}
+        />
+        <Stack.Screen
           name="sign-in"
           options={{
-            headerShown: false,
+            headerTitle: '',
             animation: 'none',
           }}
         />

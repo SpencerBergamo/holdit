@@ -22,11 +22,11 @@ const iconMap: Record<string, { ios: SFSymbol; android: keyof typeof MaterialIco
     compose: { ios: 'square.and.pencil', android: 'create' },
 }
 
-export default function PlatformIcon({ name, size = 24, color = '#000' }: PlatformIconProps) {
+export default function PlatformIcon({ name, size = 24, color = '#fff' }: PlatformIconProps) {
     const mapped = iconMap[name];
 
     if (Platform.OS === 'ios') {
-        return <SymbolView name={mapped.ios} size={size} />;
+        return <SymbolView name={mapped.ios} size={size} tintColor={color} />;
     }
 
     return <MaterialIcons name={mapped.android} size={size} color={color} />;
