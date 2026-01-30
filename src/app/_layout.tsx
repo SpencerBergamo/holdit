@@ -34,21 +34,19 @@ function RootLayoutNav() {
         <Stack.Screen
           name="sign-up"
           options={{
-            headerTitle: '',
-            animation: 'default',
+            headerTitle: ''
           }}
         />
         <Stack.Screen
           name="sign-in"
           options={{
-            headerTitle: '',
-            animation: 'none',
+            headerTitle: ''
           }}
         />
       </Stack.Protected>
 
       <Stack.Protected guard={isAuthenticated}>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="index" options={{}} />
       </Stack.Protected>
 
     </Stack>

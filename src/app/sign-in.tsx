@@ -15,7 +15,7 @@ import {
   View
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface FormData {
   email: string;
@@ -45,7 +45,6 @@ export default function SignIn() {
   const [emailCode, setEmailCode] = useState('');
 
   async function handleSignIn(data: FormData) {
-    console.log('handleSignIn', data);
     if (!isLoaded) return;
 
     try {
@@ -119,63 +118,71 @@ export default function SignIn() {
 
   if (showEmailCodeVerification) {
     return (
-      <KeyboardAwareScrollView
-        bottomOffset={40}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingTop: insets.top }}
-      >
+      <View style={[styles.container, { backgroundColor: colors.bg }]}>
+        <KeyboardAwareScrollView
+          bottomOffset={40}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingTop: insets.top + 60 },
+          ]}
+        >
+          <View style={styles.content}>
+            <Text style={[styles.title, { color: colors.text }]}>New device?</Text>
+            <Text style={[styles.subtitle, { color: colors.textMuted }]}>
+              Enter the verification code we sent to your email
+            </Text>
 
-        <SafeAreaView style={{ paddingHorizontal: 16 }}>
+            <TextInput
+              autoFocus
+              style={[styles.input, { borderColor: colors.border, color: colors.text, backgroundColor: colors.elevated }]}
+              placeholder="Verification code"
+              placeholderTextColor={colors.textMuted}
+              value={emailCode}
+              onChangeText={setEmailCode}
+              keyboardType="number-pad"
+              editable={!loading}
+              onSubmitEditing={handleVerifyEmailCode}
+            />
 
-          <Text style={styles.title}>Verify your email</Text>
-          <Text style={styles.subtitle}>We sent a verification code to your email</Text>
+            <Pressable
+              style={[styles.button, { backgroundColor: colors.primary, opacity: loading || emailCode.length === 0 ? 0.5 : 1 }]}
+              onPress={handleVerifyEmailCode}
+              disabled={loading || emailCode.length === 0}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Verify</Text>
+              )}
+            </Pressable>
 
-          <TextInput
-            autoFocus
-            style={styles.input}
-            placeholder="Verification code"
-            value={emailCode}
-            onChangeText={setEmailCode}
-            keyboardType="number-pad"
-            editable={!loading}
-            onSubmitEditing={handleVerifyEmailCode}
-          />
-
-          <Pressable
-            style={styles.button}
-            onPress={handleVerifyEmailCode}
-            disabled={loading || emailCode.length === 0}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Verify Email</Text>
-            )}
-          </Pressable>
-
-          <Pressable
-            style={styles.button}
-            onPress={() => setShowEmailCodeVerification(false)}
-          >
-            <Text style={styles.buttonText}>Cancel</Text>
-          </Pressable>
-        </SafeAreaView>
-
-      </KeyboardAwareScrollView>
+            <Pressable
+              style={[styles.textButton, { marginTop: 16 }]}
+              onPress={() => setShowEmailCodeVerification(false)}
+              disabled={loading}
+            >
+              <Text style={[styles.textButtonLabel, { color: colors.textMuted }]}>Go back</Text>
+            </Pressable>
+          </View>
+        </KeyboardAwareScrollView>
+      </View>
     );
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bg }}>
-
+    <View style={[styles.container, { backgroundColor: colors.bg }]}>
       <KeyboardAwareScrollView
         bottomOffset={40}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingTop: insets.top }}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: insets.top + 60 },
+        ]}
       >
-        <SafeAreaView style={{ paddingHorizontal: 16 }}>
-          <Text style={styles.title}>Welcome to HoldIt</Text>
-          <Text style={styles.subtitle}>Sign in to sync your data across devices</Text>
+        <View style={styles.content}>
+          <Text style={[styles.title, { color: colors.text }]}>Welcome back</Text>
+          <Text style={[styles.subtitle, { color: colors.textMuted }]}>Sign in to continue</Text>
 
           <Controller
             control={control}
@@ -184,8 +191,9 @@ export default function SignIn() {
               <TextInput
                 ref={emailRef}
                 autoFocus
-                style={styles.input}
+                style={[styles.input, { borderColor: colors.border, color: colors.text, backgroundColor: colors.elevated }]}
                 placeholder="Email"
+                placeholderTextColor={colors.textMuted}
                 value={value}
                 onChangeText={onChange}
                 autoCapitalize="none"
@@ -199,9 +207,7 @@ export default function SignIn() {
             )}
           />
           {errors.email && (
-            <View style={styles.errorTextView}>
-              <Text style={{ color: '#FF3B30' }}>{errors.email?.message}</Text>
-            </View>
+            <Text style={[styles.errorText, { color: colors.error }]}>{errors.email?.message}</Text>
           )}
 
           <View style={{ position: 'relative' }}>
@@ -211,41 +217,37 @@ export default function SignIn() {
               render={({ field: { onChange, onBlur, value } }) => (
                 <TextInput
                   ref={passwordRef}
-                  style={[styles.input, { marginBottom: 0 }]}
+                  style={[styles.input, { borderColor: colors.border, color: colors.text, backgroundColor: colors.elevated }]}
                   placeholder="Password"
+                  placeholderTextColor={colors.textMuted}
                   value={value}
                   onChangeText={onChange}
                   secureTextEntry={!isPasswordVisible}
                   editable={!loading}
                   autoComplete='current-password'
                   spellCheck={false}
-                  placeholderTextColor={colors.border}
                   onBlur={onBlur}
                   onSubmitEditing={handleSubmit(handleSignIn)}
                 />
               )} />
 
             <Pressable
-              style={{ position: 'absolute', right: 12, top: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}
+              style={styles.eyeButton}
               onPress={() => setIsPasswordVisible(!isPasswordVisible)}
             >
               <PlatformIcon
                 name={isPasswordVisible ? 'eye' : 'eyeOff'}
                 size={20}
-                color={colors.text}
+                color={colors.textMuted}
               />
             </Pressable>
           </View>
           {errors.password && (
-            <View style={styles.errorTextView}>
-              <Text style={{ color: '#FF3B30' }}>{errors.password?.message}</Text>
-            </View>
+            <Text style={[styles.errorText, { color: colors.error }]}>{errors.password?.message}</Text>
           )}
 
-          <View style={{ marginBottom: 16 }} />
-
           <Pressable
-            style={[styles.button, styles.primaryButton]}
+            style={[styles.button, { backgroundColor: colors.primary, opacity: loading || !isValid ? 0.5 : 1 }]}
             onPress={handleSubmit(handleSignIn)}
             disabled={loading || !isValid}
           >
@@ -256,24 +258,16 @@ export default function SignIn() {
             )}
           </Pressable>
 
-
-          {/* Social OAuth Buttons */}
-
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>OR</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
           <Pressable
-            style={[styles.button, styles.secondaryButton]}
-            onPress={() => router.push('/sign-up')}
+            style={styles.textButton}
+            onPress={() => router.replace('/sign-up')}
             disabled={loading}
           >
-            <Text style={styles.secondaryButtonText}>Create Account</Text>
+            <Text style={[styles.textButtonLabel, { color: colors.textMuted }]}>
+              Don't have an account? <Text style={{ color: colors.primary, fontWeight: '600' }}>Sign up</Text>
+            </Text>
           </Pressable>
-
-        </SafeAreaView>
+        </View>
       </KeyboardAwareScrollView>
     </View>
   );
@@ -282,108 +276,75 @@ export default function SignIn() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
-    padding: 24,
-    paddingTop: 64,
-    paddingBottom: 64,
-  },
-  scrollContentLarge: {
-    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingBottom: 48,
   },
   content: {
-    width: '100%',
+    flex: 1,
+    justifyContent: 'center',
     maxWidth: 400,
-  },
-  contentLarge: {
-    maxWidth: 480,
+    width: '100%',
+    alignSelf: 'center',
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: '700',
     marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 32,
+    fontSize: 15,
+    marginBottom: 40,
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 22,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 16,
+    borderRadius: 999,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
     fontSize: 16,
-    marginBottom: 16,
-    minHeight: 48,
+    marginBottom: 12,
+    minHeight: 54,
   },
-  errorTextView: {
-    minHeight: 21,
-    justifyContent: 'center',
-    paddingHorizontal: 8,
+  errorText: {
+    fontSize: 13,
+    paddingHorizontal: 20,
     marginBottom: 8,
+    marginTop: -4,
+  },
+  eyeButton: {
+    position: 'absolute',
+    right: 16,
+    top: 0,
+    bottom: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 8,
   },
   button: {
-    padding: 16,
-    borderRadius: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 999,
     alignItems: 'center',
-    marginBottom: 12,
-    minHeight: 52,
+    marginTop: 24,
+    minHeight: 54,
     justifyContent: 'center',
-  },
-  primaryButton: {
-    backgroundColor: '#007AFF',
-  },
-  secondaryButton: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#007AFF',
-  },
-  guestButton: {
-    backgroundColor: '#f5f5f5',
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },
-  secondaryButtonText: {
-    color: '#007AFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  guestButtonText: {
-    color: '#333',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  divider: {
-    flexDirection: 'row',
+  textButton: {
+    paddingVertical: 12,
     alignItems: 'center',
-    marginVertical: 24,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#ddd',
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    color: '#666',
-    fontSize: 14,
-  },
-  guestNote: {
-    fontSize: 12,
-    color: '#999',
-    textAlign: 'center',
     marginTop: 8,
-    lineHeight: 18,
-    paddingHorizontal: 8,
+  },
+  textButtonLabel: {
+    fontSize: 14,
   },
 });

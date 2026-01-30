@@ -1,5 +1,6 @@
 import { useTheme } from '@/constants/theme';
-import { useRouter } from 'expo-router';
+import { useAuth } from '@clerk/clerk-expo';
+import { Stack, useRouter } from 'expo-router';
 import { useCallback } from 'react';
 import {
   Alert,
@@ -9,6 +10,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Collection = {
   id: number;
@@ -19,12 +21,10 @@ type Collection = {
 
 export default function HomeScreen() {
   const router = useRouter();
-  // const { colors } = useTheme();
   const { colors } = useTheme();
+  const { signOut } = useAuth();
 
-  const handleUpgradeAccount = () => {
-    router.push('/upgrade-account');
-  };
+
 
   const handleSignOut = async () => {
     Alert.alert(
@@ -36,8 +36,7 @@ export default function HomeScreen() {
           text: 'Sign Out',
           style: 'destructive',
           onPress: async () => {
-            // router.replace('/sign-in');
-
+            await signOut();
           },
         },
       ]
@@ -65,24 +64,16 @@ export default function HomeScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>My Collections</Text>
-        <Button
-          accessibilityLabel='new-collection'
-          title="+ New"
-          onPress={() => {
-            Alert.prompt(
-              "New Collection",
-              "Pick a name for your new collection to save your items to.",
-              (value) => {
-                if (value && value.trim()) {
-                  handleNewCollection(value.trim());
-                }
-              }
-            )
-          }}
-        />
-      </View>
+      <Stack.Screen options={{ headerTitle: 'HoldIt' }} />
+
+      <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+
+        <Button title="Sign Out" onPress={handleSignOut} />
+      </SafeAreaView>
+
+
+
+
 
 
     </View>
