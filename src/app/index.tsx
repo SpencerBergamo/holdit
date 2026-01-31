@@ -1,21 +1,18 @@
-import { useConvexAuth } from 'convex/react';
-import { Redirect } from 'expo-router';
-import { ActivityIndicator, View } from 'react-native';
+import { Stack } from 'expo-router';
+import { Text, View } from 'react-native';
 
-export default function IndexScreen() {
-  const { isAuthenticated, isLoading } = useConvexAuth();
+export default function WelcomeScreen() {
 
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
+  return (
+    <>
+      <Stack.Screen options={{
+        headerShown: true,
+        headerLargeTitle: true,
+        title: 'Welcome',
+      }} />
+      <View>
+        <Text>Welcome</Text>
       </View>
-    );
-  }
-
-  if (isAuthenticated) {
-    return <Redirect href="/(tabs)/home" />;
-  }
-
-  return <Redirect href="/sign-in" />;
+    </>
+  )
 }

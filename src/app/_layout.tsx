@@ -27,31 +27,24 @@ function RootLayoutNav() {
 
   return (
     <Stack screenOptions={{
-      headerTransparent: true,
+      headerShown: false,
       headerBackButtonDisplayMode: 'minimal',
+      headerShadowVisible: false,
     }}>
       <Stack.Protected guard={!isAuthenticated}>
         <Stack.Screen
+          name="index"
+        />
+        <Stack.Screen
           name="sign-up"
-          options={{
-            headerTitle: ''
-          }}
         />
         <Stack.Screen
           name="sign-in"
-          options={{
-            headerTitle: ''
-          }}
         />
       </Stack.Protected>
 
       <Stack.Protected guard={isAuthenticated}>
-        <Stack.Screen
-          name="(tabs)"
-          options={{
-            headerShown: false
-          }}
-        />
+        <Stack.Screen name="(home)" />
       </Stack.Protected>
 
     </Stack>
