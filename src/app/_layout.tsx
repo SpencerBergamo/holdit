@@ -46,7 +46,12 @@ function RootLayoutNav() {
       </Stack.Protected>
 
       <Stack.Protected guard={isAuthenticated}>
-        <Stack.Screen name="index" options={{}} />
+        <Stack.Screen
+          name="(tabs)"
+          options={{
+            headerShown: false
+          }}
+        />
       </Stack.Protected>
 
     </Stack>
