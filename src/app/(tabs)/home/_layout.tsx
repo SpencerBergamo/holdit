@@ -29,6 +29,10 @@ export default function HomeLayout() {
         headerTransparent: true,
       }} />
 
+      <Stack.Screen name="[productId]" options={{
+
+      }} />
+
       <Stack.Screen name="[collectionId]" options={{
         title: '',
         headerShadowVisible: false,

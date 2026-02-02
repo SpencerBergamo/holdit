@@ -1,3 +1,3 @@
-import { NewProduct } from "@/screens/collections";
+import { NewProductScreen } from "@/screens/product";
 
-export default NewProduct;
+export default NewProductScreen;
