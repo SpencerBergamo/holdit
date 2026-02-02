@@ -1,8 +1,3 @@
+import { Collections } from "@/screens/collections";
 
-
-export default function CollectionsScreen() {
-
-  return (
-    <></>
-  )
-}
+export default Collections;

@@ -1,6 +1,5 @@
 import { Stack } from "expo-router";
 
-
-export default function SearchLayout() {
+export default function CameraLayout() {
   return <Stack />
 }
