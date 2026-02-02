@@ -1,5 +1,6 @@
+import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 
 export const createProductManually = mutation({
   args: {
@@ -47,3 +48,21 @@ export const createProductManually = mutation({
     });
   }
 });
+
+export const getUserProducts = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+  }, handler: async (ctx, { paginationOpts }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new ConvexError('Unauthorized');
+
+    const convexProfile = await ctx.db.query('profiles').withIndex('by_clerk_id', q => q.eq('clerkId', identity.subject)).first();
+    if (!convexProfile) throw new ConvexError('Convex profile not found');
+
+    return await ctx.db
+      .query('products')
+      .withIndex('by_owner_id', q => q.eq('ownerId', convexProfile._id))
+      .order('desc')
+      .paginate(paginationOpts);
+  }
+})

@@ -7,24 +7,27 @@ export default defineSchema({
         name: v.string(),
         imageUrl: v.optional(v.string()),
         clerkId: v.string(),
+        pinnedCollections: v.optional(v.array(v.id('collections'))),
         friends: v.array(v.object({
             friendId: v.id('profiles'),
             status: v.union(v.literal('pending'), v.literal('accepted'), v.literal('rejected'), v.literal('blocked')),
             requestedBy: v.id('profiles'),
             updatedAt: v.number(),
         }))
-    }).index('by_clerk_id', ['clerkId']),
+    }).index('by_clerk_id', ['clerkId'])
+        .index('by_pinned_collections', ['pinnedCollections']),
 
     collections: defineTable({
         ownerId: v.id('profiles'),
         name: v.string(),
         description: v.optional(v.string()),
         isPublic: v.boolean(),
+        numberOfItems: v.number(),
     }).index('by_owner_id', ['ownerId']),
 
     products: defineTable({
         ownerId: v.id('profiles'),
-        collectionId: v.id('collections'),
+        collectionId: v.optional(v.id('collections')),
         priority: v.optional(v.union(v.literal('low'), v.literal('medium'), v.literal('high'))),
         purchased: v.optional(v.boolean()),
         updatedAt: v.number(),

@@ -1,4 +1,5 @@
 
+import { useTheme } from '@/constants/theme';
 import { MaterialIcons } from '@expo/vector-icons';
 import { SFSymbol, SymbolView } from 'expo-symbols';
 import { Platform } from 'react-native';
@@ -23,9 +24,11 @@ const iconMap: Record<string, { ios: SFSymbol; android: keyof typeof MaterialIco
     home: { ios: 'house', android: 'home' },
     homeFill: { ios: 'house.fill', android: 'home' },
     search: { ios: 'magnifyingglass', android: 'search' },
+    filter: { ios: 'line.3.horizontal.decrease', android: 'filter' },
 }
 
-export default function PlatformIcon({ name, size = 24, color = '#fff' }: PlatformIconProps) {
+export default function PlatformIcon({ name, size = 24 }: PlatformIconProps) {
+    const { colors } = useTheme();
     const mapped = iconMap[name];
 
     if (Platform.OS === 'ios') {
@@ -33,7 +36,7 @@ export default function PlatformIcon({ name, size = 24, color = '#fff' }: Platfo
             <SymbolView
                 name={mapped.ios}
                 size={size}
-                tintColor={color}
+                tintColor={colors.text}
             />
         );
     }
@@ -42,7 +45,7 @@ export default function PlatformIcon({ name, size = 24, color = '#fff' }: Platfo
         <MaterialIcons
             name={mapped.android}
             size={size}
-            color={color}
+            color={colors.text}
         />
     );
 }

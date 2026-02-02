@@ -1,6 +1,6 @@
+import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
-import { mutation } from "./_generated/server";
-
+import { mutation, query } from "./_generated/server";
 
 export const createCollection = mutation({
   args: {
@@ -21,7 +21,7 @@ export const createCollection = mutation({
       name,
       description,
       isPublic,
-      products: [],
+      numberOfItems: 0,
     });
   },
 });
@@ -71,5 +71,44 @@ export const deleteCollection = mutation({
     if (collection.ownerId !== convexProfile._id) throw new ConvexError('Unauthorized');
 
     await ctx.db.delete(collectionId);
+  }
+});
+
+export const getUserCollections = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+  }, handler: async (ctx, { paginationOpts }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new ConvexError('Unauthorized');
+
+    const convexProfile = await ctx.db.query('profiles').withIndex('by_clerk_id', q => q.eq('clerkId', identity.subject)).first();
+    if (!convexProfile) throw new ConvexError('Convex profile not found');
+
+    return await ctx.db.query('collections')
+      .withIndex('by_owner_id', q => q.eq('ownerId', convexProfile._id))
+      .order('desc')
+      .paginate(paginationOpts);
+  }
+})
+
+export const getPinnedCollections = query({
+  args: {}, handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new ConvexError('Unauthorized');
+
+    const clerkId = identity.subject;
+    const convexProfile = await ctx.db.query('profiles').withIndex('by_clerk_id', q => q.eq('clerkId', clerkId)).first();
+    if (!convexProfile) throw new ConvexError('Convex profile not found');
+
+    const pinned = convexProfile.pinnedCollections;
+    if (!pinned) return [];
+
+    const collections = await Promise.all(
+      pinned.map((id) => ctx.db.get(id))
+    );
+
+    return collections
+      .filter((c): c is NonNullable<typeof c> => c !== null)
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
 });
