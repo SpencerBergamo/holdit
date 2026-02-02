@@ -57,13 +57,10 @@ export default function HomeScreen() {
           name={collection.name}
           description={collection.description}
           isPublic={collection.isPublic}
-          parentStyles={{ marginBottom: 12 }}
+          parentStyles={{ marginBottom: 2 }}
         />
       ))}
     </ScrollView>
-
-
-
   );
 
 }

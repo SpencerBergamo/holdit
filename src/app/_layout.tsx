@@ -44,7 +44,7 @@ function RootLayoutNav() {
       </Stack.Protected>
 
       <Stack.Protected guard={isAuthenticated}>
-        <Stack.Screen name="(home)" />
+        <Stack.Screen name="(tabs)" />
       </Stack.Protected>
 
     </Stack>

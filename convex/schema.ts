@@ -4,32 +4,40 @@ import { v } from "convex/values";
 
 export default defineSchema({
     profiles: defineTable({
-
+        name: v.string(),
+        imageUrl: v.optional(v.string()),
+        clerkId: v.string(),
         friends: v.array(v.object({
             friendId: v.id('profiles'),
             status: v.union(v.literal('pending'), v.literal('accepted'), v.literal('rejected'), v.literal('blocked')),
             requestedBy: v.id('profiles'),
             updatedAt: v.number(),
         }))
-    }),
+    }).index('by_clerk_id', ['clerkId']),
 
     collections: defineTable({
+        ownerId: v.id('profiles'),
         name: v.string(),
         description: v.optional(v.string()),
         isPublic: v.boolean(),
-        products: v.array(v.id('products')),
-    }),
+    }).index('by_owner_id', ['ownerId']),
 
     products: defineTable({
+        ownerId: v.id('profiles'),
+        collectionId: v.id('collections'),
+        priority: v.optional(v.union(v.literal('low'), v.literal('medium'), v.literal('high'))),
+        purchased: v.optional(v.boolean()),
+        updatedAt: v.number(),
         name: v.string(),
         description: v.optional(v.string()),
         imageUrl: v.optional(v.string()),
         url: v.optional(v.string()),
         price: v.optional(v.number()),
         currency: v.optional(v.string()),
-        updatedAt: v.number(),
         size: v.optional(v.string()),
         color: v.optional(v.string()),
         brand: v.optional(v.string()),
-    }).searchIndex('by_name', { searchField: 'name' }),
+    }).index('by_owner_id', ['ownerId'])
+        .index('by_collection_id', ['collectionId'])
+        .searchIndex('by_name', { searchField: 'name' }),
 })

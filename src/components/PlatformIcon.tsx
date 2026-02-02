@@ -22,6 +22,7 @@ const iconMap: Record<string, { ios: SFSymbol; android: keyof typeof MaterialIco
     compose: { ios: 'square.and.pencil', android: 'create' },
     home: { ios: 'house', android: 'home' },
     homeFill: { ios: 'house.fill', android: 'home' },
+    search: { ios: 'magnifyingglass', android: 'search' },
 }
 
 export default function PlatformIcon({ name, size = 24, color = '#fff' }: PlatformIconProps) {
