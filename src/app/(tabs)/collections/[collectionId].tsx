@@ -1,2 +1,2 @@
-import { CollectionItem } from "@/screens/collections";
-export default CollectionItem;
+import { CollectionDetail } from "@/screens/collections";
+export default CollectionDetail;

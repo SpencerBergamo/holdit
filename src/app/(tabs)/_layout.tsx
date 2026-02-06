@@ -1,9 +1,6 @@
-import { useTheme } from '@/constants/theme';
 import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
 
 export default function TabsLayout() {
-  const { colors } = useTheme();
-
   return (
     <NativeTabs
       minimizeBehavior='onScrollDown'
