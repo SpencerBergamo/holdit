@@ -34,12 +34,22 @@ function RootLayoutNav() {
       <Stack.Protected guard={!isAuthenticated}>
         <Stack.Screen
           name="index"
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="sign-up"
         />
         <Stack.Screen
           name="sign-in"
+        />
+        <Stack.Screen
+          name="forgot-password"
+        />
+        <Stack.Screen
+          name="reset-code"
+        />
+        <Stack.Screen
+          name="reset-password"
         />
       </Stack.Protected>
 

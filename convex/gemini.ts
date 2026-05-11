@@ -1,13 +1,22 @@
 import { ProductData } from "@/types/convex-types";
-import { GoogleGenAI } from "@google/genai";
-import { ConvexError, v } from "convex/values";
+import { GoogleGenAI, } from "@google/genai";
+import { ConvexError } from "convex/values";
 import { z } from "zod";
-import { api } from "./_generated/api";
-import { action } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
 
-const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-const productSchema = z.object({
+// ============================================================================
+// Constants
+// ============================================================================
+
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+if (!GEMINI_API_KEY) {
+  console.warn('GEMINI_API_KEY is not set - Gemini features will not work');
+}
+
+const genai = GEMINI_API_KEY ? new GoogleGenAI({ apiKey: GEMINI_API_KEY }) : null;
+
+export const productSchema = z.object({
   brand: z.string().describe('The brand of the product'),
   name: z.string().describe('The name or model of the product'),
   description: z.string().describe('The description of the product'),
@@ -17,54 +26,140 @@ const productSchema = z.object({
   currency: z.string().describe('The currency of the price'),
   size: z.string().describe('The size of the product selected by the user (if applicable)'),
   color: z.string().describe('The color of the product selected by the user (if applicable)'),
-})
+});
 
-export async function getProductFromAI(input: any[]): Promise<ProductData> {
-  const interaction = await genai.interactions.create({
-    model: 'gemini-2.5-flash',
-    input,
-    response_format: z.toJSONSchema(productSchema),
-    generation_config: {
-      thinking_level: 'low',
-    }
-  });
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  initialDelayMs: 1000,
+  maxDelayMs: 10000,
+  backoffMultiplier: 2,
+};
 
-  const textOutput = interaction.outputs?.find((o) => o.type === 'text');
-  if (!textOutput || !textOutput.text) throw new ConvexError("No output from Gemini");
+const RETRYABLE_ERROR_PATTERNS = [
+  'rate limit',
+  'quota exceeded',
+  'timeout',
+  '503',
+  '429',
+  'temporarily unavailable',
+  'internal error',
+];
 
-  return JSON.parse(textOutput.text);
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+function isRetryableError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+  return RETRYABLE_ERROR_PATTERNS.some(pattern => message.includes(pattern));
 }
 
-export const newProductFromURL = action({
-  args: {
-    url: v.string(),
-    collectionId: v.id('collections'),
-  },
-  handler: async (ctx, { url, collectionId }) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new ConvexError('Unauthorized');
+function calculateBackoffDelay(attempt: number): number {
+  const baseDelay = RETRY_CONFIG.initialDelayMs * Math.pow(RETRY_CONFIG.backoffMultiplier, attempt);
+  const jitter = Math.random() * 0.3 * baseDelay; // Add up to 30% jitter
+  return Math.min(baseDelay + jitter, RETRY_CONFIG.maxDelayMs);
+}
 
-    const htmlResponse = await fetch(url);
-    if (!htmlResponse.ok) throw new ConvexError('Failed to fetch HTML');
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-    const contentType = htmlResponse.headers.get('content-type');
-    const data = contentType?.includes('application/json')
-      ? await htmlResponse.json()
-      : await htmlResponse.text();
-
-    const productData = await getProductFromAI([`Analyze this content and find the primary product details: ${data.substring(0, 5000)}`]);
-
-    await ctx.runMutation(api.products.newProduct, {
-      collectionId,
-      name: productData.name ?? '',
-      brand: productData.brand ?? '',
-      description: productData.description ?? '',
-      imageUrl: productData.imageUrl ?? '',
-      url: productData.url ?? '',
-      price: productData.price ?? 0,
-      currency: productData.currency ?? '',
-      size: productData.size ?? '',
-      color: productData.color ?? '',
-    });
+function validateInput(input: unknown[]): void {
+  if (!Array.isArray(input)) {
+    throw new ConvexError('Input must be an array');
   }
-});
+  if (input.length === 0) {
+    throw new ConvexError('Input array cannot be empty');
+  }
+  // Check for excessively large inputs
+  const inputStr = JSON.stringify(input);
+  if (inputStr.length > 1_000_000) { // 1MB limit
+    throw new ConvexError('Input exceeds maximum size limit');
+  }
+}
+
+// ============================================================================
+// Response Helpers
+// ============================================================================
+
+export function parseGeminiResponse(responseText: string): ProductData {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(responseText);
+  } catch (e) {
+    throw new ConvexError(`Failed to parse Gemini response as JSON: ${e instanceof Error ? e.message : 'Unknown error'}`);
+  }
+
+  // Validate against schema with safe parsing
+  const result = productSchema.safeParse(parsed);
+
+  if (!result.success) {
+    // Return partial data with defaults for missing fields
+    const partialData = parsed as Record<string, unknown>;
+    return {
+      brand: typeof partialData.brand === 'string' ? partialData.brand : '',
+      name: typeof partialData.name === 'string' ? partialData.name : '',
+      description: typeof partialData.description === 'string' ? partialData.description : '',
+      imageUrl: typeof partialData.imageUrl === 'string' ? partialData.imageUrl : '',
+      url: typeof partialData.url === 'string' ? partialData.url : '',
+      price: typeof partialData.price === 'number' ? partialData.price : 0,
+      currency: typeof partialData.currency === 'string' ? partialData.currency : 'USD',
+      size: typeof partialData.size === 'string' ? partialData.size : '',
+      color: typeof partialData.color === 'string' ? partialData.color : '',
+    };
+  }
+
+  return result.data;
+}
+
+// ============================================================================
+// Main Function
+// ============================================================================
+
+export async function getProductFromURL(input: any[]): Promise<ProductData> {
+  if (!genai) throw new ConvexError('Gemini API is not configured. Please set GEMINI_API_KEY environment variable.');
+
+  validateInput(input);
+
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= RETRY_CONFIG.maxRetries; attempt++) {
+    try {
+      const interaction = await genai.interactions.create({
+        model: 'gemini-2.5-flash',
+        input,
+        response_format: z.toJSONSchema(productSchema),
+        generation_config: {
+          thinking_level: 'low',
+        }
+      });
+
+      const textOutput = interaction.outputs?.find((o) => o.type === 'text');
+      if (!textOutput || !textOutput.text) {
+        throw new ConvexError('No text output received from Gemini');
+      }
+
+      return parseGeminiResponse(textOutput.text);
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      // Don't retry on validation errors or non-retryable errors
+      if (error instanceof ConvexError || !isRetryableError(error)) {
+        throw error;
+      }
+
+      // Don't retry on last attempt
+      if (attempt === RETRY_CONFIG.maxRetries) {
+        break;
+      }
+
+      const delay = calculateBackoffDelay(attempt);
+      console.log(`Gemini API call failed (attempt ${attempt + 1}/${RETRY_CONFIG.maxRetries + 1}), retrying in ${delay}ms...`);
+      await sleep(delay);
+    }
+  }
+
+  throw new ConvexError(`Gemini API call failed after ${RETRY_CONFIG.maxRetries + 1} attempts: ${lastError?.message ?? 'Unknown error'}`);
+}
+
+export async function getProductFromImage(storageId: Id<'_storage'>) { }

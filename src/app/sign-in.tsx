@@ -82,9 +82,10 @@ export default function SignIn() {
         console.warn(JSON.stringify(signInAttempt, null, 2));
         throw new Error('Failed to sign in');
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error('Sign-in error:', e);
-      Alert.alert('Error', 'Failed to sign in');
+      const errorMessage = e?.errors?.[0]?.longMessage || e?.message || 'Please try again';
+      Alert.alert('Unable to sign in', errorMessage);
     }
 
   }
@@ -110,9 +111,10 @@ export default function SignIn() {
       } else {
         console.warn(JSON.stringify(signInAttempt, null, 2));
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error('Verification error:', e);
-      Alert.alert('Error', 'Failed to verify email code');
+      const errorMessage = e?.errors?.[0]?.longMessage || e?.message || 'Please try again';
+      Alert.alert('Unable to verify code', errorMessage);
     }
   }, [emailCode, signIn, setActive, router, isLoaded]);
 
@@ -247,6 +249,14 @@ export default function SignIn() {
           )}
 
           <Pressable
+            style={styles.forgotPassword}
+            onPress={() => router.push('/forgot-password')}
+            disabled={loading}
+          >
+            <Text style={[styles.textButtonLabel, { color: colors.primary }]}>Forgot password?</Text>
+          </Pressable>
+
+          <Pressable
             style={[styles.button, { backgroundColor: colors.primary, opacity: loading || !isValid ? 0.5 : 1 }]}
             onPress={handleSubmit(handleSignIn)}
             disabled={loading || !isValid}
@@ -338,6 +348,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  forgotPassword: {
+    alignSelf: 'flex-end',
+    paddingVertical: 4,
+    marginTop: 4,
+    marginBottom: -8,
+    paddingHorizontal: 8,
   },
   textButton: {
     paddingVertical: 12,

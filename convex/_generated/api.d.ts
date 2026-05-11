@@ -10,6 +10,7 @@
 
 import type * as collections from "../collections.js";
 import type * as gemini from "../gemini.js";
+import type * as http from "../http.js";
 import type * as products from "../products.js";
 import type * as profiles from "../profiles.js";
 
@@ -22,6 +23,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   collections: typeof collections;
   gemini: typeof gemini;
+  http: typeof http;
   products: typeof products;
   profiles: typeof profiles;
 }>;

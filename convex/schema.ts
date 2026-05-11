@@ -33,6 +33,7 @@ export default defineSchema({
         updatedAt: v.number(),
         name: v.string(),
         description: v.optional(v.string()),
+        storageId: v.optional(v.id('_storage')),
         imageUrl: v.optional(v.string()),
         url: v.optional(v.string()),
         price: v.optional(v.number()),

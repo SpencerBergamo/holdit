@@ -55,3 +55,4 @@ export const newProduct = mutation({
     });
   }
 });
+
