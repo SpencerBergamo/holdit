@@ -1,12 +1,13 @@
 import CollectionCard from "@/components/CollectionCard";
 import { FlashList } from "@shopify/flash-list";
-import { usePaginatedQuery } from "convex/react";
 import { Link } from "expo-router";
 import { Pressable } from "react-native";
-import { api } from "../../../convex/_generated/api";
 
 export function Collections() {
-  const { results, isLoading, status, loadMore } = usePaginatedQuery(api.collections.getUserCollections, {}, { initialNumItems: 15 });
+  // TODO: Replace with actual data fetching
+  const results: { _id: string; name: string; description?: string; isPublic: boolean }[] = [];
+  const isLoading = false;
+  const loadMore = (_n: number) => {};
 
   return (
     <FlashList

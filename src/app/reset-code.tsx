@@ -1,5 +1,4 @@
 import { useTheme } from '@/constants/theme';
-import { useSignIn } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -18,31 +17,18 @@ export default function ResetCode() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
-  const { isLoaded, signIn } = useSignIn();
-
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function handleVerifyCode() {
-    if (!isLoaded || !code) return;
+    // TODO: Implement with Supabase auth
+    if (!code) return;
     setLoading(true);
-
     try {
-      const result = await signIn.attemptFirstFactor({
-        strategy: 'reset_password_email_code',
-        code,
-      });
-
-      if (result.status === 'needs_new_password') {
-        router.replace('/reset-password');
-      } else {
-        console.warn(JSON.stringify(result, null, 2));
-        Alert.alert('Error', 'Something went wrong. Please try again.');
-      }
+      console.log('Verify reset code:', code);
+      router.replace('/reset-password');
     } catch (err: any) {
-      const errorMessage =
-        err?.errors?.[0]?.longMessage || err?.message || 'Please try again';
-      Alert.alert('Unable to verify code', errorMessage);
+      Alert.alert('Unable to verify code', err?.message || 'Please try again');
     } finally {
       setLoading(false);
     }

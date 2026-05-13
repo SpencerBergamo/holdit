@@ -1,7 +1,5 @@
 import PlatformIcon from '@/components/PlatformIcon';
 import { useTheme } from '@/constants/theme';
-import { useSignIn } from '@clerk/clerk-expo';
-import type { EmailCodeFactor } from '@clerk/types';
 import { useRouter } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -26,7 +24,7 @@ export default function SignIn() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
-  const { isLoaded, signIn, setActive } = useSignIn();
+  // TODO: Replace with Supabase auth
 
   const { control,
     handleSubmit,
@@ -45,78 +43,26 @@ export default function SignIn() {
   const [emailCode, setEmailCode] = useState('');
 
   async function handleSignIn(data: FormData) {
-    if (!isLoaded) return;
-
+    // TODO: Implement with Supabase auth
+    setLoading(true);
     try {
-      const signInAttempt = await signIn.create({
-        identifier: data.email,
-        password: data.password,
-      });
-
-      if (signInAttempt.status === 'complete') {
-        await setActive({
-          session: signInAttempt.createdSessionId,
-          navigate: async ({ session }) => {
-            if (session?.currentTask) {
-              console.log(session?.currentTask);
-              return;
-            }
-
-            router.replace('/');
-          }
-        });
-      } else if (signInAttempt.status === 'needs_second_factor') {
-        const emailCodeFactor = signInAttempt.supportedSecondFactors?.find(
-          (factor): factor is EmailCodeFactor => factor.strategy === 'email_code',
-        )
-
-        if (emailCodeFactor) {
-          await signIn.prepareSecondFactor({
-            strategy: 'email_code',
-            emailAddressId: emailCodeFactor.emailAddressId,
-          });
-
-          setShowEmailCodeVerification(true);
-        }
-      } else {
-        console.warn(JSON.stringify(signInAttempt, null, 2));
-        throw new Error('Failed to sign in');
-      }
+      console.log('Sign in:', data.email);
+      router.replace('/');
     } catch (e: any) {
-      console.error('Sign-in error:', e);
-      const errorMessage = e?.errors?.[0]?.longMessage || e?.message || 'Please try again';
-      Alert.alert('Unable to sign in', errorMessage);
+      Alert.alert('Unable to sign in', e?.message || 'Please try again');
+    } finally {
+      setLoading(false);
     }
-
   }
 
   const handleVerifyEmailCode = useCallback(async () => {
-    if (!isLoaded) return;
-
+    // TODO: Implement with Supabase auth if needed
     try {
-      const signInAttempt = await signIn.attemptSecondFactor({
-        strategy: 'email_code',
-        code: emailCode,
-      });
-
-      if (signInAttempt.status === 'complete') {
-        await setActive({
-          session: signInAttempt.createdSessionId,
-          navigate: async ({ session }) => {
-            if (session?.currentTask) {
-              console.log(session?.currentTask);
-            }
-          }
-        });
-      } else {
-        console.warn(JSON.stringify(signInAttempt, null, 2));
-      }
+      console.log('Verify email code:', emailCode);
     } catch (e: any) {
-      console.error('Verification error:', e);
-      const errorMessage = e?.errors?.[0]?.longMessage || e?.message || 'Please try again';
-      Alert.alert('Unable to verify code', errorMessage);
+      Alert.alert('Unable to verify code', e?.message || 'Please try again');
     }
-  }, [emailCode, signIn, setActive, router, isLoaded]);
+  }, [emailCode]);
 
   if (showEmailCodeVerification) {
     return (

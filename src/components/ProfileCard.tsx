@@ -1,5 +1,4 @@
 import { useTheme } from '@/constants/theme';
-import { useUser } from '@clerk/clerk-expo';
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
@@ -8,9 +7,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 export function ProfileCard() {
   const router = useRouter();
   const { colors, space, radius, type, shadow } = useTheme();
-  const { user } = useUser();
-
-  if (!user) return null;
+  // TODO: Replace with Supabase user data
+  const user = { imageUrl: '', fullName: 'User', username: '' };
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

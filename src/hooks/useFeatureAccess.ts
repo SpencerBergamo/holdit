@@ -1,12 +1,11 @@
-import { useConvexAuth } from 'convex/react';
-
 type FeatureName = 'cloudSync' | 'unlimitedStorage' | 'advancedFeatures';
 
 export const useFeatureAccess = () => {
-  const { isAuthenticated } = useConvexAuth();
+  // TODO: Replace with Supabase auth state
+  const isSignedIn = false;
 
   const hasFeature = (feature: FeatureName): boolean => {
-    return !!isAuthenticated;
+    return !!isSignedIn;
   };
 
   const canAccessCloudSync = hasFeature('cloudSync');
@@ -14,7 +13,7 @@ export const useFeatureAccess = () => {
   const canAccessAdvancedFeatures = hasFeature('advancedFeatures');
 
   return {
-    isAuthenticated,
+    isAuthenticated: !!isSignedIn,
     hasFeature,
     canAccessCloudSync,
     canAccessUnlimitedStorage,

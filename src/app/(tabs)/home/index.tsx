@@ -1,14 +1,18 @@
 import PlatformIcon from "@/components/PlatformIcon";
 import { useTheme } from "@/constants/theme";
-import { Product } from "@/types/convex-types";
 import { ContextMenu, Host, Button as SwiftButton } from "@expo/ui/swift-ui";
 import { FlashList, ListRenderItem } from "@shopify/flash-list";
-import { usePaginatedQuery } from "convex/react";
 import { Link, router, Stack } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Image, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
-import { api } from "../../../../convex/_generated/api";
+
+// TODO: Replace with actual data source
+type Product = {
+  _id: string;
+  name: string;
+  imageUrl?: string;
+};
 
 export default function HomeScreen() {
   const { width: screenWidth } = useWindowDimensions();
@@ -19,13 +23,10 @@ export default function HomeScreen() {
   const measured = useRef<Set<string>>(new Set());
   const [heights, setHeights] = useState<Record<string, number>>({});
 
-  const { results, isLoading, status, loadMore } = usePaginatedQuery(
-    api.products.getUserProducts,
-    {},
-    {
-      initialNumItems: 10,
-    }
-  );
+  // TODO: Replace with actual data fetching
+  const results: Product[] = [];
+  const isLoading = false;
+  const loadMore = (_n: number) => {};
 
   useEffect(() => {
     results.forEach((item) => {

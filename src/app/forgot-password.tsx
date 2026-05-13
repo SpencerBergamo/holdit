@@ -1,5 +1,4 @@
 import { useTheme } from '@/constants/theme';
-import { useSignIn } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -18,26 +17,18 @@ export default function ForgotPassword() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
-  const { isLoaded, signIn } = useSignIn();
-
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function handleRequestCode() {
-    if (!isLoaded || !email) return;
+    // TODO: Implement with Supabase auth
+    if (!email) return;
     setLoading(true);
-
     try {
-      await signIn.create({
-        strategy: 'reset_password_email_code',
-        identifier: email,
-      });
-
+      console.log('Request reset code for:', email);
       router.push('/reset-code');
     } catch (err: any) {
-      const errorMessage =
-        err?.errors?.[0]?.longMessage || err?.message || 'Please try again';
-      Alert.alert('Unable to reset password', errorMessage);
+      Alert.alert('Unable to reset password', err?.message || 'Please try again');
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,4 @@
 import { useTheme } from '@/constants/theme';
-import { useUser } from '@clerk/clerk-expo';
 import { ContextMenu, Host, Button as SwiftButton } from '@expo/ui/swift-ui';
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
@@ -31,7 +30,8 @@ export function EditProfile() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colors, space, radius, type } = useTheme();
-  const { user } = useUser();
+  // TODO: Replace with Supabase user data
+  const user = { firstName: '', lastName: '', username: '', imageUrl: '' };
   const [loading, setLoading] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -92,10 +92,7 @@ export function EditProfile() {
 
     setUploadingImage(true);
     try {
-      // Clerk expects the format: data:image/jpeg;base64,{base64string}
-      const base64WithPrefix = `data:image/jpeg;base64,${asset.base64}`;
-
-      await user.setProfileImage({ file: base64WithPrefix });
+      // TODO: Implement profile image upload with Supabase storage
       setProfileImage(asset.uri);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (err: any) {
@@ -115,11 +112,8 @@ export function EditProfile() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     try {
-      await user.update({
-        firstName: data.firstName,
-        lastName: data.lastName,
-        username: data.username,
-      });
+      // TODO: Implement profile update with Supabase
+      console.log('Update profile:', data);
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert('Success', 'Profile updated successfully', [

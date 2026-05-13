@@ -1,6 +1,5 @@
 import { ProfileCard } from '@/components/ProfileCard';
 import { useTheme } from '@/constants/theme';
-import { useAuth } from '@clerk/clerk-expo';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
@@ -18,8 +17,6 @@ export function Profile() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colors, space, radius, type } = useTheme();
-  const { signOut } = useAuth();
-
   const handleSignOut = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Alert.alert(
@@ -31,8 +28,8 @@ export function Profile() {
           text: 'Sign Out',
           style: 'destructive',
           onPress: async () => {
+            // TODO: Implement with Supabase auth
             try {
-              await signOut();
               router.replace('/');
             } catch (err) {
               console.error('Sign out error:', err);

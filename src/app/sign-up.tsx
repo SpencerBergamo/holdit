@@ -1,6 +1,5 @@
 import PlatformIcon from '@/components/PlatformIcon';
 import { useTheme } from '@/constants/theme';
-import { useSignUp } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -26,7 +25,7 @@ export default function SignUp() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
-  const { isLoaded, signUp, setActive } = useSignUp();
+  // TODO: Replace with Supabase auth
 
   const {
     control,
@@ -48,49 +47,30 @@ export default function SignUp() {
   const [code, setCode] = useState('');
 
   async function handleSignUp(data: FormData) {
-    if (!isLoaded) return;
+    // TODO: Implement with Supabase auth
     setLoading(true);
-
     try {
-      await signUp.create({
-        emailAddress: data.email,
-        password: data.password,
-      });
-
-      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
-      setPendingVerification(true);
-
+      console.log('Sign up:', data.email);
+      router.replace('/');
     } catch (err: any) {
-      console.error('Sign-up error:', JSON.stringify(err, null, 2));
-      const errorMessage = err?.errors?.[0]?.longMessage || err?.message || 'Please try again';
-      Alert.alert('Unable to create account', errorMessage);
+      Alert.alert('Unable to create account', err?.message || 'Please try again');
     } finally {
       setLoading(false);
     }
   }
 
   const handleVerifyEmail = useCallback(async () => {
-    if (!isLoaded || !signUp) return;
+    // TODO: Implement with Supabase auth
     setLoading(true);
-
     try {
-      const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code,
-      });
-
-      if (completeSignUp.status === 'complete') {
-        await setActive({ session: completeSignUp.createdSessionId });
-        router.replace('/');
-      } else {
-        throw new Error('Failed to verify email', { cause: JSON.stringify(completeSignUp, null, 2) });
-      }
+      console.log('Verify email:', code);
+      router.replace('/');
     } catch (e: any) {
-      const errorMessage = e?.errors?.[0]?.longMessage || e?.message || 'Please try again';
-      Alert.alert("Unable to verify email", errorMessage);
+      Alert.alert('Unable to verify email', e?.message || 'Please try again');
     } finally {
       setLoading(false);
     }
-  }, [isLoaded, code, signUp, setActive, router]);
+  }, [code, router]);
 
   if (pendingVerification) {
     return (

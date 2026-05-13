@@ -1,6 +1,6 @@
 module.exports = {
   testEnvironment: 'node',
-  testMatch: ['<rootDir>/convex/__tests__/**/*.[jt]s?(x)'],
+  testMatch: ['<rootDir>/__tests__/**/*.[jt]s?(x)', '<rootDir>/src/**/*.test.[jt]s?(x)'],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
       tsconfig: {
@@ -13,11 +13,10 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-  testPathIgnorePatterns: ['/node_modules/', '/convex/_generated/'],
+  testPathIgnorePatterns: ['/node_modules/'],
   collectCoverageFrom: [
-    'convex/**/*.ts',
+    'src/**/*.{ts,tsx}',
     '!**/*.d.ts',
     '!**/node_modules/**',
-    '!convex/_generated/**',
   ],
 };

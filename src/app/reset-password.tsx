@@ -1,6 +1,5 @@
 import PlatformIcon from '@/components/PlatformIcon';
 import { useTheme } from '@/constants/theme';
-import { useSignIn } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -19,32 +18,19 @@ export default function ResetPassword() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
-  const { isLoaded, signIn, setActive } = useSignIn();
-
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleResetPassword() {
-    if (!isLoaded || password.length < 8) return;
+    // TODO: Implement with Supabase auth
+    if (password.length < 8) return;
     setLoading(true);
-
     try {
-      const result = await signIn.resetPassword({
-        password,
-      });
-
-      if (result.status === 'complete') {
-        await setActive({ session: result.createdSessionId });
-        router.replace('/');
-      } else {
-        console.warn(JSON.stringify(result, null, 2));
-        Alert.alert('Error', 'Something went wrong. Please try again.');
-      }
+      console.log('Reset password');
+      router.replace('/');
     } catch (err: any) {
-      const errorMessage =
-        err?.errors?.[0]?.longMessage || err?.message || 'Please try again';
-      Alert.alert('Unable to reset password', errorMessage);
+      Alert.alert('Unable to reset password', err?.message || 'Please try again');
     } finally {
       setLoading(false);
     }
