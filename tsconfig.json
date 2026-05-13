@@ -4,6 +4,7 @@
     "module": "ESNext",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
+    "types": ["jest"],
     "paths": {
       "@/*": [
         "./src/*"
