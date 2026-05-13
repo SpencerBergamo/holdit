@@ -1,7 +1,9 @@
 import PlatformIcon from '@/components/PlatformIcon';
 import { useTheme } from '@/constants/theme';
+import { supabase } from '@/utils/supabase';
+import { AuthApiError } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
-import { useCallback, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   ActivityIndicator,
@@ -25,7 +27,6 @@ export default function SignUp() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
-  // TODO: Replace with Supabase auth
 
   const {
     control,
@@ -44,33 +45,74 @@ export default function SignUp() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pendingVerification, setPendingVerification] = useState(false);
-  const [code, setCode] = useState('');
 
   async function handleSignUp(data: FormData) {
-    // TODO: Implement with Supabase auth
     setLoading(true);
     try {
-      console.log('Sign up:', data.email);
-      router.replace('/');
-    } catch (err: any) {
-      Alert.alert('Unable to create account', err?.message || 'Please try again');
+      const { data: authData, error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+      });
+
+      if (error) throw error;
+
+      // Supabase returns a fake user with empty identities if the email
+      // is already registered (to avoid leaking account existence).
+      if (authData.user && authData.user.identities?.length === 0) {
+        Alert.alert(
+          'Account may already exist',
+          'If you already have an account, try signing in instead.'
+        );
+        return;
+      }
+
+      if (authData.session) {
+        // Auto-confirmed — session picked up by onAuthStateChange
+      } else {
+        // Email confirmation required
+        setPendingVerification(true);
+      }
+    } catch (e: unknown) {
+      if (__DEV__) {
+        console.error('[SignUp] Auth error:', {
+          message: e instanceof Error ? e.message : String(e),
+          code: e instanceof AuthApiError ? e.code : undefined,
+          status: e instanceof AuthApiError ? e.status : undefined,
+        });
+      }
+
+      let title = 'Unable to create account';
+      let message = 'Something went wrong. Please try again.';
+
+      if (e instanceof AuthApiError) {
+        switch (e.code) {
+          case 'user_already_exists':
+            message = 'An account with this email already exists. Try signing in instead.';
+            break;
+          case 'weak_password':
+            title = 'Weak password';
+            message = e.message;
+            break;
+          case 'over_request_limit':
+          case 'over_email_send_rate_limit':
+            title = 'Too many attempts';
+            message = 'Please wait a moment before trying again.';
+            break;
+          case 'validation_failed':
+            message = 'Please check your email and password and try again.';
+            break;
+          default:
+            message = e.message;
+        }
+      } else if (e instanceof Error) {
+        message = e.message;
+      }
+
+      Alert.alert(title, message);
     } finally {
       setLoading(false);
     }
   }
-
-  const handleVerifyEmail = useCallback(async () => {
-    // TODO: Implement with Supabase auth
-    setLoading(true);
-    try {
-      console.log('Verify email:', code);
-      router.replace('/');
-    } catch (e: any) {
-      Alert.alert('Unable to verify email', e?.message || 'Please try again');
-    } finally {
-      setLoading(false);
-    }
-  }, [code, router]);
 
   if (pendingVerification) {
     return (
@@ -86,31 +128,14 @@ export default function SignUp() {
           <View style={styles.content}>
             <Text style={[styles.title, { color: colors.text }]}>Check your email</Text>
             <Text style={[styles.subtitle, { color: colors.textMuted }]}>
-              Enter the verification code we sent you
+              We sent a confirmation link to your email.{"\n"}Tap the link to activate your account, then come back and sign in.
             </Text>
 
-            <TextInput
-              autoFocus
-              style={[styles.input, { borderColor: colors.border, color: colors.text, backgroundColor: colors.elevated }]}
-              placeholder="Verification code"
-              placeholderTextColor={colors.textMuted}
-              value={code}
-              onChangeText={setCode}
-              keyboardType="number-pad"
-              editable={!loading}
-              onSubmitEditing={handleVerifyEmail}
-            />
-
             <Pressable
-              style={[styles.button, { backgroundColor: colors.primary, opacity: loading || code.length === 0 ? 0.5 : 1 }]}
-              onPress={handleVerifyEmail}
-              disabled={loading || code.length === 0}
+              style={[styles.button, { backgroundColor: colors.primary }]}
+              onPress={() => router.replace('/sign-in')}
             >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.buttonText}>Verify</Text>
-              )}
+              <Text style={styles.buttonText}>Go to Sign In</Text>
             </Pressable>
           </View>
         </KeyboardAwareScrollView>

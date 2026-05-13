@@ -2,7 +2,7 @@ import { AppTheme, darkTheme, lightTheme } from "@/theme";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Appearance } from "react-native";
 
-const MyThemeContext = createContext<AppTheme>(lightTheme);
+const MyThemeContext = createContext<AppTheme | undefined>(undefined);
 
 interface ThemeProviderProps {
    children: React.ReactNode;

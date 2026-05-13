@@ -1,7 +1,9 @@
 import PlatformIcon from '@/components/PlatformIcon';
 import { useTheme } from '@/constants/theme';
+import { supabase } from '@/utils/supabase';
+import { AuthApiError } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
-import { useCallback, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   ActivityIndicator,
@@ -24,7 +26,6 @@ export default function SignIn() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
-  // TODO: Replace with Supabase auth
 
   const { control,
     handleSubmit,
@@ -38,84 +39,57 @@ export default function SignIn() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Second Factor Verification
-  const [showEmailCodeVerification, setShowEmailCodeVerification] = useState(false);
-  const [emailCode, setEmailCode] = useState('');
-
   async function handleSignIn(data: FormData) {
-    // TODO: Implement with Supabase auth
     setLoading(true);
     try {
-      console.log('Sign in:', data.email);
-      router.replace('/');
-    } catch (e: any) {
-      Alert.alert('Unable to sign in', e?.message || 'Please try again');
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+
+      if (error) throw error;
+      // Session is picked up by onAuthStateChange in _layout
+    } catch (e: unknown) {
+      if (__DEV__) {
+        console.error('[SignIn] Auth error:', {
+          message: e instanceof Error ? e.message : String(e),
+          code: e instanceof AuthApiError ? e.code : undefined,
+          status: e instanceof AuthApiError ? e.status : undefined,
+        });
+      }
+
+      let title = 'Unable to sign in';
+      let message = 'Something went wrong. Please try again.';
+
+      if (e instanceof AuthApiError) {
+        switch (e.code) {
+          case 'invalid_credentials':
+            message = 'Invalid email or password.';
+            break;
+          case 'email_not_confirmed':
+            title = 'Email not verified';
+            message = 'Please check your email and confirm your account before signing in.';
+            break;
+          case 'user_banned':
+            title = 'Account suspended';
+            message = 'Your account has been suspended. Please contact support.';
+            break;
+          case 'over_request_limit':
+          case 'over_email_send_rate_limit':
+            title = 'Too many attempts';
+            message = 'Please wait a moment before trying again.';
+            break;
+          default:
+            message = e.message;
+        }
+      } else if (e instanceof Error) {
+        message = e.message;
+      }
+
+      Alert.alert(title, message);
     } finally {
       setLoading(false);
     }
-  }
-
-  const handleVerifyEmailCode = useCallback(async () => {
-    // TODO: Implement with Supabase auth if needed
-    try {
-      console.log('Verify email code:', emailCode);
-    } catch (e: any) {
-      Alert.alert('Unable to verify code', e?.message || 'Please try again');
-    }
-  }, [emailCode]);
-
-  if (showEmailCodeVerification) {
-    return (
-      <View style={[styles.container, { backgroundColor: colors.bg }]}>
-        <KeyboardAwareScrollView
-          bottomOffset={40}
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[
-            styles.scrollContent,
-            { paddingTop: insets.top + 60 },
-          ]}
-        >
-          <View style={styles.content}>
-            <Text style={[styles.title, { color: colors.text }]}>New device?</Text>
-            <Text style={[styles.subtitle, { color: colors.textMuted }]}>
-              Enter the verification code we sent to your email
-            </Text>
-
-            <TextInput
-              autoFocus
-              style={[styles.input, { borderColor: colors.border, color: colors.text, backgroundColor: colors.elevated }]}
-              placeholder="Verification code"
-              placeholderTextColor={colors.textMuted}
-              value={emailCode}
-              onChangeText={setEmailCode}
-              keyboardType="number-pad"
-              editable={!loading}
-              onSubmitEditing={handleVerifyEmailCode}
-            />
-
-            <Pressable
-              style={[styles.button, { backgroundColor: colors.primary, opacity: loading || emailCode.length === 0 ? 0.5 : 1 }]}
-              onPress={handleVerifyEmailCode}
-              disabled={loading || emailCode.length === 0}
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.buttonText}>Verify</Text>
-              )}
-            </Pressable>
-
-            <Pressable
-              style={[styles.textButton, { marginTop: 16 }]}
-              onPress={() => setShowEmailCodeVerification(false)}
-              disabled={loading}
-            >
-              <Text style={[styles.textButtonLabel, { color: colors.textMuted }]}>Go back</Text>
-            </Pressable>
-          </View>
-        </KeyboardAwareScrollView>
-      </View>
-    );
   }
 
   return (
@@ -135,6 +109,13 @@ export default function SignIn() {
           <Controller
             control={control}
             name="email"
+            rules={{
+              required: 'Email is required',
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: 'Invalid email address',
+              },
+            }}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 ref={emailRef}
@@ -162,6 +143,9 @@ export default function SignIn() {
             <Controller
               control={control}
               name="password"
+              rules={{
+                required: 'Password is required',
+              }}
               render={({ field: { onChange, onBlur, value } }) => (
                 <TextInput
                   ref={passwordRef}
