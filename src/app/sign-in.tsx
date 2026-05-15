@@ -1,4 +1,4 @@
-import PlatformIcon from '@/components/PlatformIcon';
+import MyTextInput from '@/components/common/MyTextInput';
 import { useTheme } from '@/constants/theme';
 import { supabase } from '@/utils/supabase';
 import { AuthApiError } from '@supabase/supabase-js';
@@ -36,7 +36,6 @@ export default function SignIn() {
 
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleSignIn(data: FormData) {
@@ -117,12 +116,11 @@ export default function SignIn() {
               },
             }}
             render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
+              <MyTextInput
                 ref={emailRef}
                 autoFocus
-                style={[styles.input, { borderColor: colors.border, color: colors.text, backgroundColor: colors.elevated }]}
+                containerStyle={{ marginBottom: 12 }}
                 placeholder="Email"
-                placeholderTextColor={colors.textMuted}
                 value={value}
                 onChangeText={onChange}
                 autoCapitalize="none"
@@ -132,48 +130,34 @@ export default function SignIn() {
                 onSubmitEditing={() => passwordRef.current?.focus()}
                 returnKeyType='next'
                 returnKeyLabel='next'
+                error={errors.email?.message}
               />
             )}
           />
-          {errors.email && (
-            <Text style={[styles.errorText, { color: colors.error }]}>{errors.email?.message}</Text>
-          )}
 
-          <View style={{ position: 'relative' }}>
-            <Controller
-              control={control}
-              name="password"
-              rules={{
-                required: 'Password is required',
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  ref={passwordRef}
-                  style={[styles.input, { borderColor: colors.border, color: colors.text, backgroundColor: colors.elevated }]}
-                  placeholder="Password"
-                  placeholderTextColor={colors.textMuted}
-                  value={value}
-                  onChangeText={onChange}
-                  secureTextEntry={!isPasswordVisible}
-                  editable={!loading}
-                  autoComplete='current-password'
-                  spellCheck={false}
-                  onBlur={onBlur}
-                  onSubmitEditing={handleSubmit(handleSignIn)}
-                />
-              )} />
-
-            <Pressable
-              style={styles.eyeButton}
-              onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-            >
-              <PlatformIcon
-                name={isPasswordVisible ? 'eye' : 'eyeOff'}
-                size={20}
-                color={colors.textMuted}
+          <Controller
+            control={control}
+            name="password"
+            rules={{
+              required: 'Password is required',
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <MyTextInput
+                ref={passwordRef}
+                containerStyle={{ marginBottom: 12 }}
+                placeholder="Password"
+                value={value}
+                onChangeText={onChange}
+                secureTextEntry
+                editable={!loading}
+                autoComplete='current-password'
+                spellCheck={false}
+                onBlur={onBlur}
+                onSubmitEditing={handleSubmit(handleSignIn)}
+                error={errors.password?.message}
               />
-            </Pressable>
-          </View>
+            )}
+          />
           {errors.password && (
             <Text style={[styles.errorText, { color: colors.error }]}>{errors.password?.message}</Text>
           )}
@@ -241,29 +225,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
   },
-  input: {
-    borderWidth: 1,
-    borderRadius: 999,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    fontSize: 16,
-    marginBottom: 12,
-    minHeight: 54,
-  },
   errorText: {
     fontSize: 13,
     paddingHorizontal: 20,
     marginBottom: 8,
     marginTop: -4,
-  },
-  eyeButton: {
-    position: 'absolute',
-    right: 16,
-    top: 0,
-    bottom: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 8,
   },
   button: {
     paddingVertical: 16,
