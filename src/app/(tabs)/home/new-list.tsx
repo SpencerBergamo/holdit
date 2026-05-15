@@ -1,2 +1,5 @@
-import { NewCollection } from "@/screens/collections";
-export default NewCollection;
+export default function NewCollectionScreen() {
+  return (
+    <></>
+  );
+}

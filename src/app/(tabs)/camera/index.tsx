@@ -1,3 +1,9 @@
-import { Camera } from "@/screens/camera";
+import { View } from "react-native";
 
-export default Camera;
+export default function CameraScreen() {
+  return (
+    <View>
+
+    </View>
+  );
+}

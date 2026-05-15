@@ -45,8 +45,6 @@ PODS:
     - ExpoModulesCore
   - ExpoCrypto (15.0.8):
     - ExpoModulesCore
-  - ExpoDomWebView (55.0.6):
-    - ExpoModulesCore
   - ExpoFileSystem (19.0.22):
     - ExpoModulesCore
   - ExpoFont (14.0.11):
@@ -69,8 +67,6 @@ PODS:
     - ExpoModulesCore
   - ExpoLinking (8.0.11):
     - ExpoModulesCore
-  - ExpoLogBox (55.0.12):
-    - React-Core
   - ExpoModulesCore (3.0.30):
     - hermes-engine
     - RCTRequired
@@ -2139,7 +2135,6 @@ DEPENDENCIES:
   - ExpoClipboard (from `../node_modules/expo-clipboard/ios`)
   - ExpoContacts (from `../node_modules/expo-contacts/ios`)
   - ExpoCrypto (from `../node_modules/expo-auth-session/node_modules/expo-crypto/ios`)
-  - "ExpoDomWebView (from `../node_modules/expo-auth-session/node_modules/expo/node_modules/@expo/log-box/node_modules/@expo/dom-webview/ios`)"
   - ExpoFileSystem (from `../node_modules/expo-file-system/ios`)
   - ExpoFont (from `../node_modules/expo-font/ios`)
   - ExpoHaptics (from `../node_modules/expo-haptics/ios`)
@@ -2148,7 +2143,6 @@ DEPENDENCIES:
   - ExpoImagePicker (from `../node_modules/expo-image-picker/ios`)
   - ExpoKeepAwake (from `../node_modules/expo-keep-awake/ios`)
   - ExpoLinking (from `../node_modules/expo-linking/ios`)
-  - "ExpoLogBox (from `../node_modules/expo-auth-session/node_modules/expo/node_modules/@expo/log-box`)"
   - ExpoModulesCore (from `../node_modules/expo-modules-core`)
   - ExpoSecureStore (from `../node_modules/expo-secure-store/ios`)
   - ExpoSharing (from `../node_modules/expo-sharing/ios`)
@@ -2266,8 +2260,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-contacts/ios"
   ExpoCrypto:
     :path: "../node_modules/expo-auth-session/node_modules/expo-crypto/ios"
-  ExpoDomWebView:
-    :path: "../node_modules/expo-auth-session/node_modules/expo/node_modules/@expo/log-box/node_modules/@expo/dom-webview/ios"
   ExpoFileSystem:
     :path: "../node_modules/expo-file-system/ios"
   ExpoFont:
@@ -2284,8 +2276,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-keep-awake/ios"
   ExpoLinking:
     :path: "../node_modules/expo-linking/ios"
-  ExpoLogBox:
-    :path: "../node_modules/expo-auth-session/node_modules/expo/node_modules/@expo/log-box"
   ExpoModulesCore:
     :path: "../node_modules/expo-modules-core"
   ExpoSecureStore:
@@ -2465,7 +2455,6 @@ SPEC CHECKSUMS:
   ExpoClipboard: b36b287d8356887844bb08ed5c84b5979bb4dd1e
   ExpoContacts: 1c976e6c0b9be9b256ea038eba5c86f5707a73ce
   ExpoCrypto: b6105ebaa15d6b38a811e71e43b52cd934945322
-  ExpoDomWebView: b2e9d601f9cb77d3c97da73234e175b64be91928
   ExpoFileSystem: ad991457efaa14253723f1dda997eac6024c700d
   ExpoFont: f543ce20a228dd702813668b1a07b46f51878d47
   ExpoHaptics: d3a6375d8dcc3a1083d003bc2298ff654fafb536
@@ -2474,7 +2463,6 @@ SPEC CHECKSUMS:
   ExpoImagePicker: 1af3e4e31512d2f34c95c2a3018a3edc40aee748
   ExpoKeepAwake: 55f75eca6499bb9e4231ebad6f3e9cb8f99c0296
   ExpoLinking: 8f0aaf69aa56f832913030503b6263dc6f647f37
-  ExpoLogBox: a678d36477ab9544fe63e0b5328a0716539b6774
   ExpoModulesCore: 9e6a5514828e7dd5ded9e99d33557be2d284e660
   ExpoSecureStore: d32f751874a2ceb5aaeebeb3578e165c1ba2b24a
   ExpoSharing: 0d983394ed4a80334bab5a0d5384f75710feb7e8
