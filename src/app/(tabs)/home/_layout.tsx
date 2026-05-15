@@ -13,7 +13,7 @@ export default function HomeLayout() {
         headerLargeTitle: true,
         headerSearchBarOptions: {
           placeholder: 'Search Products',
-        },
+        }
 
       }} />
 
@@ -38,6 +38,7 @@ export default function HomeLayout() {
         headerShadowVisible: false,
         headerTransparent: true,
       }} />
+
     </Stack>
   )
 } 

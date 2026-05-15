@@ -25,6 +25,8 @@ const iconMap: Record<string, { ios: SFSymbol; android: keyof typeof MaterialIco
     homeFill: { ios: 'house.fill', android: 'home' },
     search: { ios: 'magnifyingglass', android: 'search' },
     filter: { ios: 'line.3.horizontal.decrease', android: 'filter' },
+    camera: { ios: 'camera', android: 'photo-camera' },
+    close: { ios: 'xmark', android: 'close' },
 }
 
 export default function PlatformIcon({ name, size = 24 }: PlatformIconProps) {
