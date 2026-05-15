@@ -188,7 +188,7 @@ export default function SignIn() {
             disabled={loading}
           >
             <Text style={[styles.textButtonLabel, { color: colors.textMuted }]}>
-              Don't have an account? <Text style={{ color: colors.primary, fontWeight: '600' }}>Sign up</Text>
+              Don&apos;t have an account? <Text style={{ color: colors.primary, fontWeight: '600' }}>Sign up</Text>
             </Text>
           </Pressable>
         </View>

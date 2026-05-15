@@ -47,7 +47,7 @@ export default function ForgotPassword() {
         <View style={styles.content}>
           <Text style={[styles.title, { color: colors.text }]}>Forgot password?</Text>
           <Text style={[styles.subtitle, { color: colors.textMuted }]}>
-            Enter your email and we'll send you a code to reset your password
+            Enter your email and we&apos;ll send you a code to reset your password
           </Text>
 
           <TextInput

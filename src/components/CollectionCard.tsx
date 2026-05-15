@@ -1,7 +1,7 @@
 import { useTheme } from '@/constants/theme';
 import { MaterialIcons } from '@expo/vector-icons';
 import { SymbolView } from 'expo-symbols';
-import { Platform, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { Platform, StyleProp, Text, View, ViewStyle } from 'react-native';
 
 interface Props {
   name: string;
@@ -87,7 +87,3 @@ export default function CollectionCard({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-
-});

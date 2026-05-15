@@ -1,10 +1,10 @@
 import PlatformIcon from "@/components/PlatformIcon";
 import { useTheme } from "@/constants/theme";
-import { ContextMenu, Host, Button as SwiftButton } from "@expo/ui/swift-ui";
+import { ContextMenu, Host, Button as SwiftButton, Text as SwiftUIText } from "@expo/ui/swift-ui";
 import { FlashList, ListRenderItem } from "@shopify/flash-list";
 import { Link, router, Stack } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Image, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 // TODO: Replace with actual data source
@@ -19,13 +19,13 @@ export default function HomeScreen() {
   const { colors } = useTheme();
 
   const columnWidth = (screenWidth - 64) / 3; // 16px padding on each side + gaps between 3 columns
-  const [searchQuery, setSearchQuery] = useState('');
+  const [_searchQuery, _setSearchQuery] = useState('');
   const measured = useRef<Set<string>>(new Set());
   const [heights, setHeights] = useState<Record<string, number>>({});
 
   // TODO: Replace with actual data fetching
-  const results: Product[] = [];
-  const isLoading = false;
+  const results = useMemo<Product[]>(() => [], []);
+  const _isLoading = false;
   const loadMore = (_n: number) => {};
 
   useEffect(() => {
@@ -99,13 +99,13 @@ export default function HomeScreen() {
               <ContextMenu>
                 <ContextMenu.Items>
                   <SwiftButton systemImage="arrow.up.arrow.down">
-                    Alphabetical
+                    <SwiftUIText>Alphabetical</SwiftUIText>
                   </SwiftButton>
                   <SwiftButton systemImage="clock">
-                    Recntly Added
+                    <SwiftUIText>Recently Added</SwiftUIText>
                   </SwiftButton>
                   <SwiftButton systemImage="dollarsign">
-                    Price
+                    <SwiftUIText>Price</SwiftUIText>
                   </SwiftButton>
                 </ContextMenu.Items>
                 <ContextMenu.Trigger>
@@ -117,11 +117,11 @@ export default function HomeScreen() {
             <Host>
               <ContextMenu>
                 <ContextMenu.Items>
-                  <SwiftButton systemImage="list.bullet" onPress={() => router.push('/home/new-list')} >
-                    New List
+                  <SwiftButton systemImage="list.bullet" onPress={() => router.push('/home/new-list')}>
+                    <SwiftUIText>New List</SwiftUIText>
                   </SwiftButton>
-                  <SwiftButton systemImage="square.and.pencil" onPress={() => router.push('/home/new-product')} >
-                    New Product
+                  <SwiftButton systemImage="square.and.pencil" onPress={() => router.push('/home/new-product')}>
+                    <SwiftUIText>New Product</SwiftUIText>
                   </SwiftButton>
                 </ContextMenu.Items>
                 <ContextMenu.Trigger>

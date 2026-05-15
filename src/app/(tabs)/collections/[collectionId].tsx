@@ -13,20 +13,20 @@ export default function CollectionDetailScreen() {
   const { collectionId } = useLocalSearchParams<{ collectionId: string }>();
 
   // TODO: Replace with actual data fetching / mutations
-  const results: unknown[] = [];
-  const isLoading = false;
-  const loadMore = (_n: number) => {};
+  const _results: unknown[] = [];
+  const _isLoading = false;
+  const _loadMore = (_n: number) => {};
 
   const {
-    control,
-    handleSubmit,
-    formState: { errors, isValid }
+    control: _control,
+    handleSubmit: _handleSubmit,
+    formState: { errors: _errors, isValid: _isValid }
   } = useForm<ProductFormData>({
     mode: 'onChange',
   });
 
   // TODO: Re-implement with new backend — pass URL to Gemini to extract product details
-  const createProductFromURL = async (url: string) => {
+  const _createProductFromURL = async (url: string) => {
     try {
       // TODO: Call backend to create product from URL
       console.warn('createProductFromURL not yet implemented');
@@ -37,7 +37,7 @@ export default function CollectionDetailScreen() {
   };
 
   // TODO: Re-implement with new backend — pass photo to Gemini to find and store product
-  const createProductFromImage = async (useCamera: boolean) => {
+  const _createProductFromImage = async (useCamera: boolean) => {
     try {
       const pickerOptions = {
         allowsMultipleSelection: false,
@@ -77,7 +77,7 @@ export default function CollectionDetailScreen() {
   };
 
   // TODO: Re-implement with new backend — create product manually
-  const onSubmit = async (data: ProductFormData) => {
+  const _onSubmit = async (data: ProductFormData) => {
     try {
       // TODO: Call backend to create product
       console.warn('onSubmit not yet implemented');

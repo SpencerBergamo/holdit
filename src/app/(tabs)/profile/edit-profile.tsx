@@ -1,11 +1,11 @@
 import { useTheme } from '@/constants/theme';
-import { ContextMenu, Host, Button as SwiftButton } from '@expo/ui/swift-ui';
+import { ContextMenu, Host, Button as SwiftButton, Text as SwiftUIText } from '@expo/ui/swift-ui';
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { Stack, useRouter } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   ActivityIndicator,
@@ -29,9 +29,9 @@ interface FormData {
 export default function EditProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { colors, space, radius, type } = useTheme();
+  const { colors, space, radius } = useTheme();
   // TODO: Replace with Supabase user data
-  const user = { firstName: '', lastName: '', username: '', imageUrl: '' };
+  const user = useMemo(() => ({ firstName: '', lastName: '', username: '', imageUrl: '' }), []);
   const [loading, setLoading] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -51,6 +51,24 @@ export default function EditProfileScreen() {
     },
   });
 
+  const uploadProfileImage = useCallback(async (asset: ImagePicker.ImagePickerAsset) => {
+    if (!user || !asset.base64) return;
+
+    setUploadingImage(true);
+    try {
+      // TODO: Implement profile image upload with Supabase storage
+      setProfileImage(asset.uri);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (err: any) {
+      console.error('Image upload error:', err);
+      const errorMessage = err?.errors?.[0]?.longMessage || err?.message || 'Please try again';
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert('Unable to upload image', errorMessage);
+    } finally {
+      setUploadingImage(false);
+    }
+  }, [user]);
+
   const pickImageFromLibrary = useCallback(async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -64,7 +82,7 @@ export default function EditProfileScreen() {
     if (!result.canceled && result.assets[0]) {
       await uploadProfileImage(result.assets[0]);
     }
-  }, []);
+  }, [uploadProfileImage]);
 
   const pickImageFromCamera = useCallback(async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -85,25 +103,7 @@ export default function EditProfileScreen() {
     if (!result.canceled && result.assets[0]) {
       await uploadProfileImage(result.assets[0]);
     }
-  }, []);
-
-  const uploadProfileImage = async (asset: ImagePicker.ImagePickerAsset) => {
-    if (!user || !asset.base64) return;
-
-    setUploadingImage(true);
-    try {
-      // TODO: Implement profile image upload with Supabase storage
-      setProfileImage(asset.uri);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch (err: any) {
-      console.error('Image upload error:', err);
-      const errorMessage = err?.errors?.[0]?.longMessage || err?.message || 'Please try again';
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert('Unable to upload image', errorMessage);
-    } finally {
-      setUploadingImage(false);
-    }
-  };
+  }, [uploadProfileImage]);
 
   const onSubmit = useCallback(async (data: FormData) => {
     if (!user) return;
@@ -163,10 +163,10 @@ export default function EditProfileScreen() {
             <ContextMenu>
               <ContextMenu.Items>
                 <SwiftButton systemImage="photo" onPress={pickImageFromLibrary}>
-                  Choose from Library
+                  <SwiftUIText>Choose from Library</SwiftUIText>
                 </SwiftButton>
                 <SwiftButton systemImage="camera" onPress={pickImageFromCamera}>
-                  Take Photo
+                  <SwiftUIText>Take Photo</SwiftUIText>
                 </SwiftButton>
               </ContextMenu.Items>
               <ContextMenu.Trigger>

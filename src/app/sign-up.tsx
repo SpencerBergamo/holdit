@@ -39,7 +39,7 @@ export default function SignUp() {
   // Refs
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
-  const confirmPasswordRef = useRef<TextInput>(null);
+  const _confirmPasswordRef = useRef<TextInput>(null);
 
   // States
   const [loading, setLoading] = useState(false);

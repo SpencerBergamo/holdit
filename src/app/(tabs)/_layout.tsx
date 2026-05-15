@@ -1,26 +1,26 @@
-import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
+import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
 export default function TabsLayout() {
   return (
     <NativeTabs minimizeBehavior='onScrollDown'>
       <NativeTabs.Trigger name="home">
-        <Icon sf="house.fill" />
-        <Label>Home</Label>
+        <NativeTabs.Trigger.Icon sf="house.fill" md="home" />
+        <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="collections">
-        <Icon sf="list.bullet" />
-        <Label>Lists</Label>
+        <NativeTabs.Trigger.Icon sf="list.bullet" md="list" />
+        <NativeTabs.Trigger.Label>Lists</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="profile">
-        <Icon sf="person.circle" />
-        <Label>Account</Label>
+        <NativeTabs.Trigger.Icon sf="person.circle" md="account_circle" />
+        <NativeTabs.Trigger.Label>Account</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="camera" role="search">
-        <Icon sf="camera" />
-        <Label>Camera</Label>
+        <NativeTabs.Trigger.Icon sf="camera" md="camera_alt" />
+        <NativeTabs.Trigger.Label>Camera</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );

@@ -6,7 +6,7 @@ import { Pressable } from "react-native";
 export default function CollectionsScreen() {
   // TODO: Replace with actual data fetching
   const results: { _id: string; name: string; description?: string; isPublic: boolean }[] = [];
-  const isLoading = false;
+  const _isLoading = false;
   const loadMore = (_n: number) => {};
 
   return (

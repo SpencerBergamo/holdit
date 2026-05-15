@@ -16,7 +16,7 @@ interface SettingItem {
 export default function ProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { colors, space, radius, type } = useTheme();
+  const { colors, space, radius } = useTheme();
 
   const handleSignOut = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);

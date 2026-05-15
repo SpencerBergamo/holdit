@@ -8,17 +8,17 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const FEATURES = [
   {
-    emoji: '📸',
+    emoji: '&#1F4F8;',
     title: 'Save anything',
     description: 'Snap a photo, paste a link, or add items manually',
   },
   {
-    emoji: '📁',
+    emoji: '&#1F4C1;',
     title: 'Stay organized',
     description: 'Group your saves into collections for any occasion',
   },
   {
-    emoji: '🎁',
+    emoji: '&#1F381;',
     title: 'Share with friends',
     description: 'Let loved ones see exactly what you want',
   },

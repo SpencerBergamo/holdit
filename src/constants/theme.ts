@@ -34,7 +34,7 @@ const palette = {
 };
 
 export const useTheme = () => {
-    const scheme = useColorScheme();
+    const _scheme = useColorScheme();
     // const isDark = scheme === 'dark';
     const isDark = false;
 

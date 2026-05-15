@@ -35,7 +35,7 @@ const MyTextInput = React.forwardRef<TextInput, MyTextInputProps>(
 
          errorProgress.value = withTiming(hasError ? 1 : 0, { duration: ANIM_DURATION });
          prevHadError.current = hasError;
-      }, [error]);
+      }, [error, errorProgress]);
 
       const animatedBorderStyle = useAnimatedStyle(() => ({
          borderColor: interpolateColor(

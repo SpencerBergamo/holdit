@@ -10,14 +10,14 @@ interface FormData {
 
 export default function NewProductScreen() {
   const {
-    control,
-    handleSubmit,
-    formState: { errors, isDirty }
+    control: _control,
+    handleSubmit: _handleSubmit,
+    formState: { errors: _errors, isDirty: _isDirty }
   } = useForm<FormData>({
     mode: 'onChange',
   });
 
-  const pickImageFromLibrary = async () => {
+  const _pickImageFromLibrary = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert('Permission Required', 'Media library permission is required to pick images.');
@@ -35,7 +35,7 @@ export default function NewProductScreen() {
     if (!result.canceled && result.assets[0]) { }
   };
 
-  const pickImageFromCamera = async () => {
+  const _pickImageFromCamera = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert('Permission Required', 'Camera permission is required to take photos.');
