@@ -67,7 +67,10 @@ function RootLayoutNav() {
         </Stack.Protected>
 
         <Stack.Protected guard={isSignedIn}>
-          <Stack.Screen name="(tabs)" />
+          <Stack.Screen
+            name="(home)"
+            options={{ headerShown: false }}
+          />
         </Stack.Protected>
 
       </Stack>
