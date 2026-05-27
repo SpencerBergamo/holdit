@@ -12,9 +12,13 @@ export default function HomeLayout() {
          }}
       >
          <Stack.Screen name="index" />
-         <Stack.Screen name="profile" />
-         <Stack.Screen name="lists" />
-         <Stack.Screen name="camera" />
+         <Stack.Screen
+            name="(profile)"
+            options={{
+               headerShown: false,
+               presentation: "modal",
+            }}
+         />
       </Stack>
    );
 }

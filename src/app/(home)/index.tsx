@@ -1,21 +1,27 @@
+import FloatingActionButton, {
+   FabAction,
+} from "@/components/common/FloatingActionButton";
+import PlatformIcon from "@/components/PlatformIcon";
 import WishlistCard from "@/components/WishlistCard";
 import { useMyTheme } from "@/contexts/MyThemeContext";
 import { FlashList, ListRenderItem } from "@shopify/flash-list";
+import { router } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 type Wishlist = {
    id: string;
+   private: boolean;
    name: string;
    itemCount: number;
 };
 
 const WISHLIST_DATA: Wishlist[] = [
-   { id: "1", name: "Birthday ideas", itemCount: 12 },
-   { id: "2", name: "Kitchen upgrades", itemCount: 5 },
-   { id: "3", name: "Books to read", itemCount: 8 },
-   // { id: "4", name: "Holiday gifts", itemCount: 14 },
-   // { id: "5", name: "Running gear", itemCount: 3 },
+   { id: "1", private: true, name: "Birthday ideas", itemCount: 12 },
+   { id: "2", private: false, name: "Kitchen upgrades", itemCount: 5 },
+   { id: "3", private: true, name: "Books to read", itemCount: 8 },
+   { id: "4", private: false, name: "Holiday gifts", itemCount: 14 },
+   { id: "5", private: false, name: "Running gear", itemCount: 3 },
 ];
 
 export default function HomeScreen() {
@@ -34,11 +40,43 @@ export default function HomeScreen() {
       );
    }, [search]);
 
+   const fabActions = useMemo<FabAction[]>(
+      () => [
+         {
+            id: "profile",
+            icon: <PlatformIcon name="profile" size={22} />,
+            accessibilityLabel: "Profile",
+            onPress: () => {
+               router.push('/(home)/(profile)');
+            },
+         },
+         {
+            id: "search",
+            icon: <PlatformIcon name="search" size={22} />,
+            accessibilityLabel: "Search",
+            onPress: () => { },
+         },
+         {
+            id: "new-wishlist",
+            icon: <PlatformIcon name="compose" size={22} />,
+            accessibilityLabel: "New wishlist",
+            onPress: () => { },
+         },
+         {
+            id: "add-item",
+            icon: <PlatformIcon name="camera" size={22} />,
+            accessibilityLabel: "Add item",
+            onPress: () => { },
+         },
+      ],
+      [],
+   );
+
    const listContentStyle = useMemo(
       () => ({
          paddingHorizontal: horizontalPadding,
          paddingTop: spacing.s,
-         paddingBottom: spacing.xl,
+         paddingBottom: spacing.xl * 3,
       }),
       [horizontalPadding, spacing.s, spacing.xl],
    );
@@ -79,6 +117,8 @@ export default function HomeScreen() {
             alignItems: "center",
          }}
       >
+         <FloatingActionButton actions={fabActions} />
+
          <FlashList
             data={filteredWishlists}
             keyExtractor={(item) => item.id}
@@ -96,9 +136,6 @@ export default function HomeScreen() {
                alignSelf: "stretch",
                width: "100%",
             }}
-            ListFooterComponent={() => (
-               <View></View>
-            )}
          />
       </View>
    );

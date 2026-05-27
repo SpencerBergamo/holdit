@@ -27,18 +27,29 @@ const iconMap: Record<string, { ios: SFSymbol; android: keyof typeof MaterialIco
     filter: { ios: 'line.3.horizontal.decrease', android: 'filter' },
     camera: { ios: 'camera', android: 'photo-camera' },
     close: { ios: 'xmark', android: 'close' },
+    settings: { ios: 'gearshape', android: 'settings' },
+    appearance: { ios: 'paintbrush', android: 'palette' },
+    bell: { ios: 'bell', android: 'notifications' },
+    moon: { ios: 'moon', android: 'dark-mode' },
+    lock: { ios: 'lock', android: 'lock' },
+    shield: { ios: 'hand.raised', android: 'security' },
+    help: { ios: 'questionmark.circle', android: 'help-outline' },
+    mail: { ios: 'envelope', android: 'mail' },
+    logout: { ios: 'rectangle.portrait.and.arrow.right', android: 'logout' },
+    friends: { ios: 'person.2', android: 'people' },
 }
 
-export default function PlatformIcon({ name, size = 24 }: PlatformIconProps) {
+export default function PlatformIcon({ name, size = 24, color }: PlatformIconProps) {
     const { colors } = useTheme();
     const mapped = iconMap[name];
+    const iconColor = color ?? colors.text;
 
     if (Platform.OS === 'ios') {
         return (
             <SymbolView
                 name={mapped.ios}
                 size={size}
-                tintColor={colors.text}
+                tintColor={iconColor}
             />
         );
     }
@@ -47,7 +58,7 @@ export default function PlatformIcon({ name, size = 24 }: PlatformIconProps) {
         <MaterialIcons
             name={mapped.android}
             size={size}
-            color={colors.text}
+            color={iconColor}
         />
     );
 }
