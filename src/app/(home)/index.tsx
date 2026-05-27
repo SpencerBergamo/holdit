@@ -1,7 +1,7 @@
 import FloatingActionButton, {
    FabAction,
 } from "@/components/common/FloatingActionButton";
-import PlatformIcon from "@/components/PlatformIcon";
+import PlatformIcon, { AvailableIcons } from "@/components/PlatformIcon";
 import WishlistCard from "@/components/WishlistCard";
 import { useMyTheme } from "@/contexts/MyThemeContext";
 import { FlashList, ListRenderItem } from "@shopify/flash-list";
@@ -44,7 +44,7 @@ export default function HomeScreen() {
       () => [
          {
             id: "profile",
-            icon: <PlatformIcon name="profile" size={22} />,
+            icon: <PlatformIcon name={AvailableIcons.profile} size={22} />,
             accessibilityLabel: "Profile",
             onPress: () => {
                router.push('/(home)/(profile)');
@@ -52,21 +52,21 @@ export default function HomeScreen() {
          },
          {
             id: "search",
-            icon: <PlatformIcon name="search" size={22} />,
+            icon: <PlatformIcon name={AvailableIcons.search} size={22} />,
             accessibilityLabel: "Search",
             onPress: () => { },
          },
          {
             id: "new-wishlist",
-            icon: <PlatformIcon name="compose" size={22} />,
+            icon: <PlatformIcon name={AvailableIcons.compose} size={22} />,
             accessibilityLabel: "New wishlist",
             onPress: () => { },
          },
          {
             id: "add-item",
-            icon: <PlatformIcon name="camera" size={22} />,
+            icon: <PlatformIcon name={AvailableIcons.camera} size={22} />,
             accessibilityLabel: "Add item",
-            onPress: () => { },
+            onPress: () => router.push("/(home)/(camera)"),
          },
       ],
       [],

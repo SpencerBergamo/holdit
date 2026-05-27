@@ -7,12 +7,42 @@ import { Platform } from 'react-native';
 type IconName = { ios: SFSymbol; android: string }
 
 interface PlatformIconProps {
-    name: IconName[keyof IconName];
+    name: AvailableIcons;
     size?: number;
     color?: string;
 }
 
-const iconMap: Record<string, { ios: SFSymbol; android: keyof typeof MaterialIcons.glyphMap }> = {
+export const enum AvailableIcons {
+    profile = 'profile',
+    eye = 'eye',
+    eyeOff = 'eyeOff',
+    menu = 'menu',
+    download = 'download',
+    share = 'share',
+    plus = 'plus',
+    compose = 'compose',
+    home = 'home',
+    homeFill = 'homeFill',
+    search = 'search',
+    filter = 'filter',
+    camera = 'camera',
+    close = 'close',
+    settings = 'settings',
+    appearance = 'appearance',
+    bell = 'bell',
+    moon = 'moon',
+    lock = 'lock',
+    shield = 'shield',
+    help = 'help',
+    mail = 'mail',
+    logout = 'logout',
+    friends = 'friends',
+    replay = 'replay',
+    checkmark = 'checkmark',
+    flip = 'flip',
+}
+
+const iconMap: Record<AvailableIcons, { ios: SFSymbol; android: keyof typeof MaterialIcons.glyphMap }> = {
     profile: { ios: 'person.circle', android: 'person' },
     eye: { ios: 'eye', android: 'visibility' },
     eyeOff: { ios: 'eye.slash', android: 'visibility-off' },
@@ -37,7 +67,11 @@ const iconMap: Record<string, { ios: SFSymbol; android: keyof typeof MaterialIco
     mail: { ios: 'envelope', android: 'mail' },
     logout: { ios: 'rectangle.portrait.and.arrow.right', android: 'logout' },
     friends: { ios: 'person.2', android: 'people' },
+    replay: { ios: 'arrow.counterclockwise', android: 'replay' },
+    checkmark: { ios: 'checkmark', android: 'check' },
+    flip: { ios: 'arrow.triangle.2.circlepath', android: 'flip' },
 }
+
 
 export default function PlatformIcon({ name, size = 24, color }: PlatformIconProps) {
     const { colors } = useTheme();

@@ -12,11 +12,21 @@ export default function HomeLayout() {
          }}
       >
          <Stack.Screen name="index" />
+
          <Stack.Screen
             name="(profile)"
             options={{
                headerShown: false,
                presentation: "modal",
+            }}
+         />
+
+         <Stack.Screen
+            name="(camera)"
+            options={{
+               headerShown: false,
+               presentation: "fullScreenModal",
+               animation: "fade",
             }}
          />
       </Stack>
