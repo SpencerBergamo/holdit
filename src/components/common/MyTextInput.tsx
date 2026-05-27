@@ -1,5 +1,5 @@
+import PlatformIcon, { AvailableIcons } from '@/components/PlatformIcon';
 import { useMyTheme } from '@/contexts/MyThemeContext';
-import PlatformIcon from '@/components/PlatformIcon';
 import * as Haptics from 'expo-haptics';
 import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, TextInputProps, View, ViewStyle } from 'react-native';
@@ -75,7 +75,7 @@ const MyTextInput = React.forwardRef<TextInput, MyTextInputProps>(
                      accessibilityLabel={isSecureHidden ? 'Show password' : 'Hide password'}
                   >
                      <PlatformIcon
-                        name={isSecureHidden ? 'eyeOff' : 'eye'}
+                        name={isSecureHidden ? AvailableIcons.eyeOff : AvailableIcons.eye}
                         size={20}
                      />
                   </Pressable>
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       alignItems: 'center',
       borderWidth: 1,
-      borderRadius: 999,
+      borderRadius: 16,
       minHeight: 54,
    },
    input: {

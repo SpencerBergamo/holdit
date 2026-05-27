@@ -41,6 +41,8 @@ export const enum AvailableIcons {
     checkmark = 'checkmark',
     flip = 'flip',
     tray = 'tray',
+    link = 'link',
+    photo = 'photo',
 }
 
 const iconMap: Record<AvailableIcons, { ios: SFSymbol; android: keyof typeof MaterialIcons.glyphMap }> = {
@@ -72,6 +74,8 @@ const iconMap: Record<AvailableIcons, { ios: SFSymbol; android: keyof typeof Mat
     checkmark: { ios: 'checkmark', android: 'check' },
     flip: { ios: 'arrow.triangle.2.circlepath', android: 'flip' },
     tray: { ios: 'tray', android: 'inbox' },
+    link: { ios: 'link', android: 'link' },
+    photo: { ios: 'photo.on.rectangle.angled', android: 'photo-library' },
 }
 
 

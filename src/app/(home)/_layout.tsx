@@ -58,6 +58,17 @@ export default function HomeLayout() {
                animation: "fade",
             }}
          />
+
+         <Stack.Screen
+            name="compose"
+            options={{
+               headerShown: true,
+               headerTitle: "",
+               headerLargeTitle: false,
+               presentation: "modal",
+               headerTransparent: true,
+            }}
+         />
       </Stack>
    );
 }

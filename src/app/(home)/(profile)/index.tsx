@@ -1,4 +1,4 @@
-import PlatformIcon from "@/components/PlatformIcon";
+import PlatformIcon, { AvailableIcons } from "@/components/PlatformIcon";
 import SettingsProfileCard, {
    SettingsProfile,
 } from "@/components/settings/SettingsProfileCard";
@@ -32,13 +32,13 @@ export default function ProfileSettingsScreen() {
          {
             key: "edit-profile",
             label: "Edit profile",
-            icon: <PlatformIcon name="compose" size={iconSize} />,
+            icon: <PlatformIcon name={AvailableIcons.compose} size={iconSize} />,
             onPress: () => router.push("/(home)/(profile)/edit-profile"),
          },
          {
             key: "change-password",
             label: "Change password",
-            icon: <PlatformIcon name="lock" size={iconSize} />,
+            icon: <PlatformIcon name={AvailableIcons.lock} size={iconSize} />,
             onPress: () => { },
          },
       ],
@@ -50,14 +50,14 @@ export default function ProfileSettingsScreen() {
          {
             key: "appearance",
             label: "Appearance",
-            icon: <PlatformIcon name="appearance" size={iconSize} />,
+            icon: <PlatformIcon name={AvailableIcons.appearance} size={iconSize} />,
             value: "Light",
             onPress: () => { },
          },
          {
             key: "language",
             label: "Language",
-            icon: <PlatformIcon name="menu" size={iconSize} />,
+            icon: <PlatformIcon name={AvailableIcons.menu} size={iconSize} />,
             value: "English",
             onPress: () => { },
          },
@@ -70,7 +70,7 @@ export default function ProfileSettingsScreen() {
          {
             key: "push",
             label: "Push notifications",
-            icon: <PlatformIcon name="bell" size={iconSize} />,
+            icon: <PlatformIcon name={AvailableIcons.bell} size={iconSize} />,
             showChevron: false,
             trailing: (
                <Switch
@@ -82,7 +82,7 @@ export default function ProfileSettingsScreen() {
          {
             key: "email-digest",
             label: "Email digest",
-            icon: <PlatformIcon name="mail" size={iconSize} />,
+            icon: <PlatformIcon name={AvailableIcons.mail} size={iconSize} />,
             showChevron: false,
             trailing: (
                <Switch value={emailDigest} onValueChange={setEmailDigest} />
@@ -91,7 +91,7 @@ export default function ProfileSettingsScreen() {
          {
             key: "friend-activity",
             label: "Friend activity",
-            icon: <PlatformIcon name="friends" size={iconSize} />,
+            icon: <PlatformIcon name={AvailableIcons.friends} size={iconSize} />,
             showChevron: false,
             trailing: (
                <Switch
@@ -103,7 +103,7 @@ export default function ProfileSettingsScreen() {
          {
             key: "gift-reminders",
             label: "Gift reminders",
-            icon: <PlatformIcon name="share" size={iconSize} />,
+            icon: <PlatformIcon name={AvailableIcons.share} size={iconSize} />,
             showChevron: false,
             trailing: (
                <Switch
@@ -127,14 +127,14 @@ export default function ProfileSettingsScreen() {
          {
             key: "visibility",
             label: "Profile visibility",
-            icon: <PlatformIcon name="eye" size={iconSize} />,
+            icon: <PlatformIcon name={AvailableIcons.eye} size={iconSize} />,
             value: "Friends only",
             onPress: () => { },
          },
          {
             key: "blocked",
             label: "Blocked users",
-            icon: <PlatformIcon name="shield" size={iconSize} />,
+            icon: <PlatformIcon name={AvailableIcons.shield} size={iconSize} />,
             onPress: () => { },
          },
       ],
@@ -146,19 +146,19 @@ export default function ProfileSettingsScreen() {
          {
             key: "help",
             label: "Help center",
-            icon: <PlatformIcon name="help" size={iconSize} />,
+            icon: <PlatformIcon name={AvailableIcons.help} size={iconSize} />,
             onPress: () => { },
          },
          {
             key: "feedback",
             label: "Send feedback",
-            icon: <PlatformIcon name="mail" size={iconSize} />,
+            icon: <PlatformIcon name={AvailableIcons.mail} size={iconSize} />,
             onPress: () => { },
          },
          {
             key: "about",
             label: "About HoldIt",
-            icon: <PlatformIcon name="settings" size={iconSize} />,
+            icon: <PlatformIcon name={AvailableIcons.settings} size={iconSize} />,
             value: "1.0.0",
             showChevron: false,
          },
@@ -209,7 +209,7 @@ export default function ProfileSettingsScreen() {
                   {
                      key: "sign-out",
                      label: "Sign out",
-                     icon: <PlatformIcon name="logout" size={iconSize} />,
+                     icon: <PlatformIcon name={AvailableIcons.logout} size={iconSize} />,
                      destructive: true,
                      showChevron: false,
                      onPress: () => { },

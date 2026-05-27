@@ -139,7 +139,7 @@ export default function HomeScreen() {
             id: "compose",
             icon: <PlatformIcon name={AvailableIcons.compose} size={22} />,
             accessibilityLabel: "Compose",
-            onPress: () => { },
+            onPress: () => router.push("/(home)/compose"),
          },
          {
             id: "add-item",
