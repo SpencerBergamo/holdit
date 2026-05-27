@@ -1,4 +1,4 @@
-import PlatformIcon from "@/components/PlatformIcon";
+import PlatformIcon, { AvailableIcons } from "@/components/PlatformIcon";
 import { useMyTheme } from "@/contexts/MyThemeContext";
 import * as Haptics from "expo-haptics";
 import { ReactNode, useCallback, useMemo, useState } from "react";
@@ -10,7 +10,9 @@ import {
    ViewStyle,
 } from "react-native";
 import Animated, {
+   runOnJS,
    SharedValue,
+   useAnimatedReaction,
    useAnimatedStyle,
    useSharedValue,
    withSpring,
@@ -50,7 +52,11 @@ export type FabAction = {
 export type FloatingActionButtonProps = {
    actions: FabAction[];
    onToggle?: (open: boolean) => void;
+   /** Called when the main FAB is pressed (e.g. to reveal after scroll-hide). */
+   onMainPress?: () => void;
    bottomOffset?: number;
+   /** Vertical offset driven by list scroll position in the parent screen. */
+   scrollTranslateY?: SharedValue<number>;
    style?: StyleProp<ViewStyle>;
 };
 
@@ -117,7 +123,9 @@ function FabActionButton({
 export default function FloatingActionButton({
    actions,
    onToggle,
+   onMainPress,
    bottomOffset = 24,
+   scrollTranslateY,
    style,
 }: FloatingActionButtonProps) {
    const { colors } = useMyTheme();
@@ -135,15 +143,29 @@ export default function FloatingActionButton({
    );
 
    const toggle = useCallback(() => {
+      onMainPress?.();
       triggerToggleHaptic();
       setExpanded(!open);
-   }, [open, setExpanded]);
+   }, [onMainPress, open, setExpanded]);
 
    const close = useCallback(() => {
       if (open) {
          setExpanded(false);
       }
    }, [open, setExpanded]);
+
+   useAnimatedReaction(
+      () => scrollTranslateY?.value ?? 0,
+      (current, previous) => {
+         if (!scrollTranslateY) {
+            return;
+         }
+         if (current > 8 && (previous ?? 0) <= 8) {
+            runOnJS(close)();
+         }
+      },
+      [scrollTranslateY],
+   );
 
    const handleActionPress = useCallback(
       (action: FabAction) => {
@@ -162,6 +184,15 @@ export default function FloatingActionButton({
       opacity: progress.value * 0.2,
    }));
 
+   const clusterScrollStyle = useAnimatedStyle(() => {
+      if (!scrollTranslateY) {
+         return {};
+      }
+      return {
+         transform: [{ translateY: scrollTranslateY.value }],
+      };
+   }, [scrollTranslateY]);
+
    return (
       <View pointerEvents="box-none" style={[styles.overlay, style]}>
          {open ? (
@@ -173,7 +204,7 @@ export default function FloatingActionButton({
             />
          ) : null}
 
-         <View
+         <Animated.View
             pointerEvents="box-none"
             style={[
                styles.fabCluster,
@@ -181,6 +212,7 @@ export default function FloatingActionButton({
                   bottom: bottomOffset + insets.bottom,
                   height: MAIN_SIZE + ARC_RADIUS,
                },
+               clusterScrollStyle,
             ]}
          >
             <View
@@ -214,10 +246,10 @@ export default function FloatingActionButton({
                      },
                   ]}
                >
-                  <PlatformIcon name="plus" size={26} color="#FFFFFF" />
+                  <PlatformIcon name={AvailableIcons.plus} size={26} color="#FFFFFF" />
                </AnimatedPressable>
             </View>
-         </View>
+         </Animated.View>
       </View>
    );
 }

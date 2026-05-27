@@ -40,6 +40,7 @@ export const enum AvailableIcons {
     replay = 'replay',
     checkmark = 'checkmark',
     flip = 'flip',
+    tray = 'tray',
 }
 
 const iconMap: Record<AvailableIcons, { ios: SFSymbol; android: keyof typeof MaterialIcons.glyphMap }> = {
@@ -66,10 +67,11 @@ const iconMap: Record<AvailableIcons, { ios: SFSymbol; android: keyof typeof Mat
     help: { ios: 'questionmark.circle', android: 'help-outline' },
     mail: { ios: 'envelope', android: 'mail' },
     logout: { ios: 'rectangle.portrait.and.arrow.right', android: 'logout' },
-    friends: { ios: 'person.2', android: 'people' },
+    friends: { ios: 'person.badge.plus', android: 'people' },
     replay: { ios: 'arrow.counterclockwise', android: 'replay' },
     checkmark: { ios: 'checkmark', android: 'check' },
     flip: { ios: 'arrow.triangle.2.circlepath', android: 'flip' },
+    tray: { ios: 'tray', android: 'inbox' },
 }
 
 
