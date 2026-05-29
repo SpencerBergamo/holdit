@@ -1,30 +1,64 @@
+import type { Collection, CollectionWithSaveCount } from '@/types/collection';
 
+const TEST_OWNER_ID = '00000000-0000-4000-8000-000000000001';
+const TEST_TIMESTAMP = '2025-01-01T00:00:00.000Z';
 
-export type Collection = {
-  id: string;
-  name: string;
-  description: string;
-  isPublic: boolean;
-  itemCount?: number;
-};
+function collection(
+  partial: Pick<Collection, 'id' | 'name'> &
+    Partial<Pick<Collection, 'description' | 'visible_to_friends'>>,
+): Collection {
+  return {
+    owner_id: TEST_OWNER_ID,
+    description: null,
+    visible_to_friends: false,
+    created_at: TEST_TIMESTAMP,
+    updated_at: TEST_TIMESTAMP,
+    ...partial,
+  };
+}
 
 export const testCollections: Collection[] = [
-  { id: '1', name: 'Wishlist', description: 'Things I want to buy', isPublic: true, itemCount: 12 },
-  { id: '2', name: 'Birthday', description: 'Gift ideas for my birthday', isPublic: true, itemCount: 8 },
-  { id: '3', name: 'Kitchen', description: 'All the products I need for my kitchen', isPublic: true, itemCount: 15 },
-  { id: '4', name: 'Bathroom', description: 'All the products I need for my bathroom', isPublic: false, itemCount: 6 },
-  { id: '5', name: 'Living Room', description: 'All the products I need for my living room', isPublic: true, itemCount: 20 },
-  { id: '6', name: 'Bedroom', description: 'All the products I need for my bedroom', isPublic: false, itemCount: 10 },
-  { id: '7', name: 'Wishlist', description: 'Things I want to buy', isPublic: true, itemCount: 12 },
-  { id: '8', name: 'Birthday', description: 'Gift ideas for my birthday', isPublic: true, itemCount: 8 },
-  { id: '9', name: 'Kitchen', description: 'All the products I need for my kitchen', isPublic: true, itemCount: 15 },
-  { id: '10', name: 'Bathroom', description: 'All the products I need for my bathroom', isPublic: false, itemCount: 6 },
-  { id: '11', name: 'Living Room', description: 'All the products I need for my living room', isPublic: true, itemCount: 20 },
-  { id: '12', name: 'Bedroom', description: 'All the products I need for my bedroom', isPublic: false, itemCount: 10 },
-  { id: '13', name: 'Wishlist', description: 'Things I want to buy', isPublic: true, itemCount: 12 },
-  { id: '14', name: 'Birthday', description: 'Gift ideas for my birthday', isPublic: true, itemCount: 8 },
-  { id: '15', name: 'Kitchen', description: 'All the products I need for my kitchen', isPublic: true, itemCount: 15 },
-  { id: '16', name: 'Bathroom', description: 'All the products I need for my bathroom', isPublic: false, itemCount: 6 },
-  { id: '17', name: 'Living Room', description: 'All the products I need for my living room', isPublic: true, itemCount: 20 },
-  { id: '18', name: 'Bedroom', description: 'All the products I need for my bedroom', isPublic: false, itemCount: 10 },
+  collection({
+    id: '10000000-0000-4000-8000-000000000001',
+    name: 'Wishlist',
+    description: 'Things I want to buy',
+    visible_to_friends: true,
+  }),
+  collection({
+    id: '10000000-0000-4000-8000-000000000002',
+    name: 'Birthday',
+    description: 'Gift ideas for my birthday',
+    visible_to_friends: true,
+  }),
+  collection({
+    id: '10000000-0000-4000-8000-000000000003',
+    name: 'Kitchen',
+    description: 'All the products I need for my kitchen',
+    visible_to_friends: true,
+  }),
+  collection({
+    id: '10000000-0000-4000-8000-000000000004',
+    name: 'Bathroom',
+    description: 'All the products I need for my bathroom',
+  }),
+  collection({
+    id: '10000000-0000-4000-8000-000000000005',
+    name: 'Living Room',
+    description: 'All the products I need for my living room',
+    visible_to_friends: true,
+  }),
+  collection({
+    id: '10000000-0000-4000-8000-000000000006',
+    name: 'Bedroom',
+    description: 'All the products I need for my bedroom',
+  }),
+];
+
+export const testCollectionsWithSaveCount: CollectionWithSaveCount[] = [
+  { ...testCollections[0], save_count: 12 },
+  { ...testCollections[1], save_count: 8 },
+  { ...testCollections[2], save_count: 15 },
+  { ...testCollections[3], save_count: 6 },
+  { ...testCollections[4], save_count: 20 },
+  { ...testCollections[5], save_count: 10 },
 ];

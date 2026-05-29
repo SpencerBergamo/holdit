@@ -1,19 +1,17 @@
 import { useTheme } from '@/constants/theme';
+import type { Collection } from '@/types/collection';
 import { MaterialIcons } from '@expo/vector-icons';
 import { SymbolView } from 'expo-symbols';
 import { Platform, StyleProp, Text, View, ViewStyle } from 'react-native';
 
-interface Props {
-  name: string;
-  description?: string;
-  isPublic: boolean;
+type Props = Pick<Collection, 'name' | 'description' | 'visible_to_friends'> & {
   parentStyles?: StyleProp<ViewStyle>;
-}
+};
 
 export default function CollectionCard({
   name,
   description,
-  isPublic,
+  visible_to_friends,
   parentStyles,
 }: Props) {
   const { colors } = useTheme();
@@ -47,7 +45,7 @@ export default function CollectionCard({
           {name}
         </Text>
 
-        {!isPublic && (
+        {!visible_to_friends && (
           <View style={{
             flexDirection: 'row',
             alignItems: 'center',
