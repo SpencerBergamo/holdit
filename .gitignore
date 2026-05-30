@@ -33,7 +33,8 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
+# local env files (secrets and machine-specific overrides)
+.env.local
 .env*.local
 
 # typescript

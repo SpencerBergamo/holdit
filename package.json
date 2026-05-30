@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "start:prod": "NODE_ENV=production expo start --clear",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "lint": "expo lint",
