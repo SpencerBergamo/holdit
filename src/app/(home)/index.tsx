@@ -4,12 +4,21 @@ import FloatingActionButton, {
 import PlatformIcon, { AvailableIcons } from "@/components/PlatformIcon";
 import WishlistCard from "@/components/WishlistCard";
 import { useMyTheme } from "@/contexts/MyThemeContext";
+import { useMyCollections } from "@/hooks/use-my-collections";
 import { useSearch } from "@/hooks/use-search";
+import type { CollectionWithSaveCount } from "@/types/collection";
 import { FlashList, ListRenderItem } from "@shopify/flash-list";
 import { router } from "expo-router";
 import { useCallback, useMemo, useRef } from "react";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
-import { StyleSheet, Text, View } from "react-native";
+import {
+   ActivityIndicator,
+   Pressable,
+   RefreshControl,
+   StyleSheet,
+   Text,
+   View,
+} from "react-native";
 import { useSharedValue, withSpring } from "react-native-reanimated";
 
 /** FAB travel distance when fully hidden (px). */
@@ -28,33 +37,15 @@ const FAB_SPRING = {
    overshootClamping: true,
 };
 
-type Wishlist = {
-   id: string;
-   private: boolean;
-   name: string;
-   itemCount: number;
-};
-
-const WISHLIST_DATA: Wishlist[] = [
-   { id: "1", private: true, name: "Birthday ideas", itemCount: 12 },
-   { id: "2", private: false, name: "Kitchen upgrades", itemCount: 5 },
-   { id: "3", private: true, name: "Books to read", itemCount: 8 },
-   { id: "4", private: false, name: "Holiday gifts", itemCount: 14 },
-   { id: "5", private: false, name: "Running gear", itemCount: 3 },
-   { id: "6", private: true, name: "Desk setup", itemCount: 7 },
-   { id: "7", private: false, name: "Camping essentials", itemCount: 9 },
-   { id: "8", private: true, name: "Gift ideas for Mom", itemCount: 11 },
-   { id: "9", private: false, name: "Holiday gifts", itemCount: 14 },
-   { id: "10", private: false, name: "Running gear", itemCount: 3 },
-   { id: "11", private: true, name: "Desk setup", itemCount: 7 },
-   { id: "12", private: false, name: "Camping essentials", itemCount: 9 },
-   { id: "13", private: true, name: "Gift ideas for Mom", itemCount: 11 },
-   { id: "14", private: false, name: "Holiday gifts", itemCount: 14 },
-   { id: "15", private: false, name: "Running gear", itemCount: 3 },
-];
-
 export default function HomeScreen() {
    const { colors, spacing } = useMyTheme();
+   const {
+      collections,
+      isLoading,
+      isRefreshing,
+      error,
+      refresh,
+   } = useMyCollections();
    const fabTranslateY = useSharedValue(0);
    const lastScrollY = useRef(0);
    const isFabHidden = useRef(false);
@@ -67,15 +58,15 @@ export default function HomeScreen() {
 
    const horizontalPadding = spacing.m;
 
-   const filteredWishlists = useMemo(() => {
+   const filteredCollections = useMemo(() => {
       const query = search.trim().toLowerCase();
       if (!query) {
-         return WISHLIST_DATA;
+         return collections;
       }
-      return WISHLIST_DATA.filter((item) =>
+      return collections.filter((item) =>
          item.name.toLowerCase().includes(query),
       );
-   }, [search]);
+   }, [collections, search]);
 
    const hideFab = useCallback(() => {
       if (isFabHidden.current) {
@@ -160,42 +151,112 @@ export default function HomeScreen() {
       [horizontalPadding, spacing.s, spacing.xl],
    );
 
-   const renderWishlist: ListRenderItem<Wishlist> = useCallback(
-      ({ item }) => (
-         <WishlistCard
-            name={item.name}
-            itemCount={item.itemCount}
-            containerStyle={{ marginBottom: spacing.s }}
-         />
-      ),
-      [spacing.s],
-   );
+   const renderCollection: ListRenderItem<CollectionWithSaveCount> =
+      useCallback(
+         ({ item }) => (
+            <WishlistCard
+               name={item.name}
+               itemCount={item.save_count}
+               containerStyle={{ marginBottom: spacing.s }}
+            />
+         ),
+         [spacing.s],
+      );
 
    const listEmpty = useMemo(() => {
-      if (!search.trim()) {
-         return null;
+      if (isLoading) {
+         return (
+            <View style={styles.emptyState}>
+               <ActivityIndicator size="large" color={colors.primary} />
+            </View>
+         );
       }
+
+      if (error) {
+         return (
+            <View style={styles.emptyState}>
+               <Text selectable style={[styles.emptyTitle, { color: colors.text }]}>
+                  Couldn&apos;t load collections
+               </Text>
+               <Text
+                  selectable
+                  style={[styles.emptyMessage, { color: colors.textMuted }]}
+               >
+                  {error}
+               </Text>
+               <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Try again"
+                  onPress={() => void refresh()}
+                  style={({ pressed }) => [
+                     styles.retryButton,
+                     {
+                        backgroundColor: colors.primary,
+                        opacity: pressed ? 0.85 : 1,
+                     },
+                  ]}
+               >
+                  <Text style={[styles.retryLabel, { color: colors.background }]}>
+                     Try again
+                  </Text>
+               </Pressable>
+            </View>
+         );
+      }
+
+      if (search.trim()) {
+         return (
+            <View style={styles.emptyState}>
+               <Text selectable style={[styles.emptyTitle, { color: colors.text }]}>
+                  No wishlists found
+               </Text>
+               <Text
+                  selectable
+                  style={[styles.emptyMessage, { color: colors.textMuted }]}
+               >
+                  {`Try a different search for "${search.trim()}"`}
+               </Text>
+            </View>
+         );
+      }
+
       return (
          <View style={styles.emptyState}>
             <Text selectable style={[styles.emptyTitle, { color: colors.text }]}>
-               No wishlists found
+               No collections yet
             </Text>
             <Text
                selectable
                style={[styles.emptyMessage, { color: colors.textMuted }]}
             >
-               {`Try a different search for "${search.trim()}"`}
+               Tap compose to create your first collection.
             </Text>
          </View>
       );
-   }, [colors.text, colors.textMuted, search]);
+   }, [
+      colors.background,
+      colors.primary,
+      colors.text,
+      colors.textMuted,
+      error,
+      isLoading,
+      refresh,
+      search,
+   ]);
 
    return (
       <>
          <FlashList
-            data={filteredWishlists}
+            data={filteredCollections}
             keyExtractor={(item) => item.id}
-            renderItem={renderWishlist}
+            renderItem={renderCollection}
+            refreshControl={
+               <RefreshControl
+                  refreshing={isRefreshing}
+                  onRefresh={() => void refresh()}
+                  tintColor={colors.primary}
+               />
+            }
             onScroll={onFabScroll}
             scrollEventThrottle={16}
             scrollEnabled={true}
@@ -234,5 +295,15 @@ const styles = StyleSheet.create({
       fontSize: 15,
       lineHeight: 21,
       textAlign: "center",
+   },
+   retryButton: {
+      marginTop: 20,
+      paddingHorizontal: 20,
+      paddingVertical: 12,
+      borderRadius: 999,
+   },
+   retryLabel: {
+      fontSize: 15,
+      fontWeight: "600",
    },
 });
