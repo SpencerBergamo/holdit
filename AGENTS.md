@@ -11,9 +11,9 @@ HoldIt lets users save products to digital wishlists called **collections**. Sav
 
 | Layer | Service |
 |-------|---------|
-| Auth | Clerk |
-| Database / Realtime | Convex |
-| File Storage | Convex (with GCS bucket) |
+| Auth | Supabase Authentication |
+| Database / Realtime | Supabase Realtime |
+| File Storage | Supabase Storage |
 | AI | Google Gemini 1.5 Flash |
 | Framework | Expo Router (file-based) |
 | Styling | Custom theme (see below) |
