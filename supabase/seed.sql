@@ -1,23 +1,93 @@
 -- Seed data for local development
+--
+-- Inserts proper auth.users rows so the handle_new_user trigger auto-creates
+-- matching profiles. Password for both users: "password123"
+--
+-- The encrypted_password below is bcrypt('password123') — safe for local dev only.
 
--- NOTE: For local dev, you can either:
---  * create auth users through Supabase Auth UI / CLI, then update IDs here, or
---  * insert directly into auth.users when running locally (not for prod).
-
--- Example deterministic UUIDs for dev users
--- Adjust to match real auth.users IDs if needed.
-
-insert into auth.users (id, email)
+insert into auth.users (
+  id,
+  instance_id,
+  aud,
+  role,
+  email,
+  encrypted_password,
+  email_confirmed_at,
+  raw_app_meta_data,
+  raw_user_meta_data,
+  created_at,
+  updated_at,
+  confirmation_token,
+  recovery_token
+)
 values
-  ('00000000-0000-0000-0000-000000000001', 'alice@example.com'),
-  ('00000000-0000-0000-0000-000000000002', 'bob@example.com')
+  (
+    '00000000-0000-0000-0000-000000000001',
+    '00000000-0000-0000-0000-000000000000',
+    'authenticated',
+    'authenticated',
+    'alice@example.com',
+    crypt('password123', gen_salt('bf')),
+    now(),
+    '{"provider": "email", "providers": ["email"]}'::jsonb,
+    '{"display_name": "Alice"}'::jsonb,
+    now(),
+    now(),
+    '',
+    ''
+  ),
+  (
+    '00000000-0000-0000-0000-000000000002',
+    '00000000-0000-0000-0000-000000000000',
+    'authenticated',
+    'authenticated',
+    'bob@example.com',
+    crypt('password123', gen_salt('bf')),
+    now(),
+    '{"provider": "email", "providers": ["email"]}'::jsonb,
+    '{"display_name": "Bob"}'::jsonb,
+    now(),
+    now(),
+    '',
+    ''
+  )
 on conflict (id) do nothing;
 
-insert into public.profiles (id, display_name, avatar_url)
+-- The handle_new_user trigger creates profiles automatically.
+-- Insert identities so Supabase Auth recognises these as email accounts.
+
+insert into auth.identities (
+  id,
+  user_id,
+  provider_id,
+  provider,
+  identity_data,
+  last_sign_in_at,
+  created_at,
+  updated_at
+)
 values
-  ('00000000-0000-0000-0000-000000000001', 'Alice', null),
-  ('00000000-0000-0000-0000-000000000002', 'Bob', null)
-on conflict (id) do nothing;
+  (
+    '00000000-0000-0000-0000-000000000001',
+    '00000000-0000-0000-0000-000000000001',
+    'alice@example.com',
+    'email',
+    jsonb_build_object('sub', '00000000-0000-0000-0000-000000000001', 'email', 'alice@example.com'),
+    now(),
+    now(),
+    now()
+  ),
+  (
+    '00000000-0000-0000-0000-000000000002',
+    '00000000-0000-0000-0000-000000000002',
+    'bob@example.com',
+    'email',
+    jsonb_build_object('sub', '00000000-0000-0000-0000-000000000002', 'email', 'bob@example.com'),
+    now(),
+    now(),
+    now()
+  )
+on conflict do nothing;
 
 -- Collections for Alice
 

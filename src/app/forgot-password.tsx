@@ -1,4 +1,6 @@
 import { useTheme } from '@/constants/theme';
+import { supabase } from '@/utils/supabase';
+import { AuthApiError } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -21,14 +23,22 @@ export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
 
   async function handleRequestCode() {
-    // TODO: Implement with Supabase auth
     if (!email) return;
     setLoading(true);
     try {
-      console.log('Request reset code for:', email);
-      router.push('/reset-code');
-    } catch (err: any) {
-      Alert.alert('Unable to reset password', err?.message || 'Please try again');
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      if (error) throw error;
+      // Always navigate — don't reveal whether the email exists
+      router.push({ pathname: '/reset-code', params: { email } });
+    } catch (e: unknown) {
+      if (e instanceof AuthApiError && (
+        e.code === 'over_request_limit' || e.code === 'over_email_send_rate_limit'
+      )) {
+        Alert.alert('Too many attempts', 'Please wait a moment before trying again.');
+      } else {
+        // Still navigate to avoid leaking account existence
+        router.push({ pathname: '/reset-code', params: { email } });
+      }
     } finally {
       setLoading(false);
     }

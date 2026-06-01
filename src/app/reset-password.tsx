@@ -1,5 +1,7 @@
 import PlatformIcon from '@/components/PlatformIcon';
 import { useTheme } from '@/constants/theme';
+import { supabase } from '@/utils/supabase';
+import { AuthApiError } from '@supabase/supabase-js';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -23,14 +25,29 @@ export default function ResetPassword() {
   const [loading, setLoading] = useState(false);
 
   async function handleResetPassword() {
-    // TODO: Implement with Supabase auth
     if (password.length < 8) return;
     setLoading(true);
     try {
-      console.log('Reset password');
-      router.replace('/');
-    } catch (err: any) {
-      Alert.alert('Unable to reset password', err?.message || 'Please try again');
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw error;
+      // Session is active — onAuthStateChange routes to (home)
+    } catch (e: unknown) {
+      let message = 'Please try again.';
+      if (e instanceof AuthApiError) {
+        switch (e.code) {
+          case 'same_password':
+            message = 'New password must be different from your current password.';
+            break;
+          case 'weak_password':
+            message = e.message;
+            break;
+          default:
+            message = e.message;
+        }
+      } else if (e instanceof Error) {
+        message = e.message;
+      }
+      Alert.alert('Unable to reset password', message);
     } finally {
       setLoading(false);
     }

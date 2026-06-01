@@ -1,5 +1,7 @@
 import { useTheme } from '@/constants/theme';
-import { useRouter } from 'expo-router';
+import { supabase } from '@/utils/supabase';
+import { AuthApiError } from '@supabase/supabase-js';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -15,20 +17,38 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ResetCode() {
   const router = useRouter();
+  const { email } = useLocalSearchParams<{ email: string }>();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function handleVerifyCode() {
-    // TODO: Implement with Supabase auth
-    if (!code) return;
+    if (!code || !email) return;
     setLoading(true);
     try {
-      console.log('Verify reset code:', code);
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token: code,
+        type: 'email',
+      });
+      if (error) throw error;
+      // User now has a valid session — navigate to set new password
       router.replace('/reset-password');
-    } catch (err: any) {
-      Alert.alert('Unable to verify code', err?.message || 'Please try again');
+    } catch (e: unknown) {
+      let message = 'Please try again.';
+      if (e instanceof AuthApiError) {
+        switch (e.code) {
+          case 'otp_expired':
+            message = 'Code has expired. Please request a new one.';
+            break;
+          default:
+            message = e.message;
+        }
+      } else if (e instanceof Error) {
+        message = e.message;
+      }
+      Alert.alert('Unable to verify code', message);
     } finally {
       setLoading(false);
     }

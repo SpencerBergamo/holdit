@@ -46,6 +46,7 @@ export default function HomeLayout() {
             name="(profile)"
             options={{
                headerShown: false,
+               headerTransparent: true,
                presentation: "modal",
             }}
          />
