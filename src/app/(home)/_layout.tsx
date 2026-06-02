@@ -4,20 +4,20 @@ import { TouchableOpacity, View } from "react-native";
 
 function HomeHeaderActions() {
    return (
-      <View style={{ flexDirection: "row", gap: 24, marginHorizontal: 12 }}>
+      <View style={{ flexDirection: "row", gap: 18, marginHorizontal: 12 }}>
          <TouchableOpacity
-            onPress={() => router.push("/")}
+            onPress={() => { }}
             accessibilityRole="button"
             accessibilityLabel="Inbox"
          >
             <PlatformIcon name={AvailableIcons.tray} size={22} />
          </TouchableOpacity>
          <TouchableOpacity
-            onPress={() => router.push("/")}
+            onPress={() => router.push("/(home)/(profile)")}
             accessibilityRole="button"
             accessibilityLabel="Notifications"
          >
-            <PlatformIcon name={AvailableIcons.bell} size={22} />
+            <PlatformIcon name={AvailableIcons.profile} size={22} />
          </TouchableOpacity>
       </View>
    );

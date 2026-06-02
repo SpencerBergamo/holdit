@@ -11,6 +11,9 @@ module.exports = defineConfig([
     files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}'],
     rules: {
       '@typescript-eslint/no-require-imports': 'off',
+
+      // Ignore Deno Import Errors
+      "import/no-unresolved": ["error", { "ignore": ["^npm:"] }],
     },
   },
 ]);

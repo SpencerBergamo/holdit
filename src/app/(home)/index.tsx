@@ -114,18 +114,18 @@ export default function HomeScreen() {
 
    const fabActions = useMemo<FabAction[]>(
       () => [
-         {
-            id: "profile",
-            icon: <PlatformIcon name={AvailableIcons.profile} size={22} />,
-            accessibilityLabel: "Profile",
-            onPress: () => router.push("/(home)/(profile)"),
-         },
-         {
-            id: "friends",
-            icon: <PlatformIcon name={AvailableIcons.friends} size={22} />,
-            accessibilityLabel: "Friends",
-            onPress: () => { },
-         },
+         // {
+         //    id: "profile",
+         //    icon: <PlatformIcon name={AvailableIcons.profile} size={22} />,
+         //    accessibilityLabel: "Profile",
+         //    onPress: () => router.push("/(home)/(profile)"),
+         // },
+         // {
+         //    id: "friends",
+         //    icon: <PlatformIcon name={AvailableIcons.friends} size={22} />,
+         //    accessibilityLabel: "Friends",
+         //    onPress: () => { },
+         // },
          {
             id: "compose",
             icon: <PlatformIcon name={AvailableIcons.compose} size={22} />,
