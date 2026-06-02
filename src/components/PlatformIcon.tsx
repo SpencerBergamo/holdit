@@ -43,6 +43,7 @@ export const enum AvailableIcons {
     tray = 'tray',
     link = 'link',
     photo = 'photo',
+    gift = 'gift',
 }
 
 const iconMap: Record<AvailableIcons, { ios: SFSymbol; android: keyof typeof MaterialIcons.glyphMap }> = {
@@ -76,6 +77,7 @@ const iconMap: Record<AvailableIcons, { ios: SFSymbol; android: keyof typeof Mat
     tray: { ios: 'tray', android: 'inbox' },
     link: { ios: 'link', android: 'link' },
     photo: { ios: 'photo.on.rectangle.angled', android: 'photo-library' },
+    gift: { ios: 'gift', android: 'cake' },
 }
 
 

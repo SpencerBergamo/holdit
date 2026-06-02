@@ -1,22 +1,13 @@
 import PlatformIcon, { AvailableIcons } from "@/components/PlatformIcon";
-import SettingsProfileCard, {
-   SettingsProfile,
-} from "@/components/settings/SettingsProfileCard";
+import ProfileCard from "@/components/profile/ProfileCard";
 import SettingsSection, {
    SettingsSectionRows,
 } from "@/components/settings/SettingsSection";
 import { useMyTheme } from "@/contexts/MyThemeContext";
+import { supabase } from "@/utils/supabase";
 import { router } from "expo-router";
-import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Switch } from "react-native";
-
-const MOCK_PROFILE: SettingsProfile = {
-   fullName: "Spencer Bergamo",
-   username: "sbergamo",
-   email: "spencer@example.com",
-   birthday: "March 15",
-   memberSince: "January 2025",
-};
+import { useCallback, useMemo, useState } from "react";
+import { Alert, ScrollView, StyleSheet, Switch, View } from "react-native";
 
 export default function ProfileSettingsScreen() {
    const { colors, spacing } = useMyTheme();
@@ -24,6 +15,13 @@ export default function ProfileSettingsScreen() {
    const [emailDigest, setEmailDigest] = useState(false);
    const [friendActivity, setFriendActivity] = useState(true);
    const [giftReminders, setGiftReminders] = useState(true);
+
+   const handleSignOut = useCallback(async () => {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+         Alert.alert("Unable to sign out", error.message);
+      }
+   }, []);
 
    const iconSize = 20;
 
@@ -181,7 +179,7 @@ export default function ProfileSettingsScreen() {
             },
          ]}
       >
-         <SettingsProfileCard profile={MOCK_PROFILE} />
+         <ProfileCard />
 
          <SettingsSection title="Account">
             <SettingsSectionRows rows={accountRows} />
@@ -212,7 +210,7 @@ export default function ProfileSettingsScreen() {
                      icon: <PlatformIcon name={AvailableIcons.logout} size={iconSize} />,
                      destructive: true,
                      showChevron: false,
-                     onPress: () => { },
+                     onPress: handleSignOut,
                   },
                ]}
             />

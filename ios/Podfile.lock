@@ -118,7 +118,7 @@ PODS:
     - ExpoModulesCore
   - ExpoSystemUI (55.0.18):
     - ExpoModulesCore
-  - ExpoUI (55.0.16):
+  - ExpoUI (55.0.17):
     - ExpoModulesCore
     - React-RCTFabric
   - ExpoWebBrowser (55.0.16):
@@ -2678,7 +2678,7 @@ SPEC CHECKSUMS:
   ExpoSQLite: f590370153b853bfebec84566e8bc3eeac7c7d54
   ExpoSymbols: 446a0835f3fb505214891d72baf5edf1de2ee4e7
   ExpoSystemUI: fbc4f8af83f2b8338c1de69a79624769536f09d1
-  ExpoUI: 9157bbfd59555db446834e23fa1e6e3689de6cea
+  ExpoUI: 3d10642147c44f94a4557f1defe2efd3244349af
   ExpoWebBrowser: 5847267c496125abe38afccae97d34cb6ecc5340
   FBLazyVector: 427fa1856a481856091061293ce865a75aa4f20f
   hermes-engine: e75c72326e8d72419c7b90858bf6b77ec1a0808b

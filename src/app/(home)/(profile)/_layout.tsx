@@ -10,8 +10,18 @@ export default function ProfileLayout() {
             headerLargeTitle: false,
          }}
       >
-         <Stack.Screen name="index" options={{ title: "Settings" }} />
-         <Stack.Screen name="edit-profile" options={{ title: "Edit Profile" }} />
+         <Stack.Screen name="index"
+            options={{
+               title: "Settings",
+               headerTransparent: true,
+            }} />
+
+         <Stack.Screen name="edit-profile"
+            options={{
+               title: "Edit Profile",
+               headerTransparent: true,
+            }} />
+
       </Stack>
    );
 }
