@@ -1,6 +1,7 @@
 import WishlistCard from "@/components/WishlistCard";
-import { useHomeFab } from "@/contexts/HomeFabContext";
+import { useFabActions, useHomeFab } from "@/contexts/HomeFabContext";
 import { useMyTheme } from "@/contexts/MyThemeContext";
+import { useHomeFabActions } from "@/hooks/use-home-fab-actions";
 import { useMyCollections } from "@/hooks/use-my-collections";
 import { useSearch } from "@/hooks/use-search";
 import type { CollectionWithSaveCount } from "@/types/collection";
@@ -19,6 +20,8 @@ import {
 export default function HomeScreen() {
    const { colors, spacing } = useMyTheme();
    const { onFabScroll } = useHomeFab();
+   const fabActions = useHomeFabActions();
+   useFabActions(fabActions);
    const {
       collections,
       isLoading,

@@ -1,18 +1,19 @@
 import FloatingActionButton, {
    type FabAction,
 } from '@/components/common/FloatingActionButton';
-import PlatformIcon, { AvailableIcons } from '@/components/PlatformIcon';
 import { FAB_SPRING, useFabScrollHide } from '@/hooks/use-fab-scroll-hide';
-import { router, useSegments } from 'expo-router';
+import { useFocusEffect, useSegments } from 'expo-router';
 import {
    createContext,
    useCallback,
    useContext,
    useEffect,
    useMemo,
+   useState,
    type ReactNode,
 } from 'react';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Animated, {
    useAnimatedStyle,
    useSharedValue,
@@ -20,116 +21,67 @@ import Animated, {
    withSpring,
 } from 'react-native-reanimated';
 
+export type FabRegistration = {
+   actions: FabAction[];
+};
+
 type HomeFabContextValue = {
    onFabScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
    showFab: () => void;
+   registerFab: (registration: FabRegistration | null) => void;
 };
 
 const HomeFabContext = createContext<HomeFabContextValue | undefined>(undefined);
 
 const HIDDEN_SEGMENT_NAMES = new Set(['compose', '(camera)', '(profile)']);
 
-/** Top-level `(home)` routes — not a collection id segment. */
-const HOME_LEVEL_STATIC_ROUTES = new Set([
-   'index',
-   'compose',
-   '(camera)',
-   '(profile)',
-]);
-
-/** Any screen under `(home)/[collection-id]/…` (index, settings, etc.). */
-function isInsideCollectionStack(segments: string[]) {
-   const homeIndex = segments.indexOf('(home)');
-   if (homeIndex === -1) {
-      return false;
-   }
-
-   const collectionSegment = segments[homeIndex + 1];
-   if (!collectionSegment) {
-      return false;
-   }
-
-   return (
-      !HOME_LEVEL_STATIC_ROUTES.has(collectionSegment) &&
-      !HIDDEN_SEGMENT_NAMES.has(collectionSegment)
-   );
-}
-
-function isHomeIndexRoute(segments: string[]) {
-   const last = segments[segments.length - 1];
-   return last === '(home)' || (last === 'index' && !isInsideCollectionStack(segments));
-}
-
-function useHomeFabVisible(segments: string[]) {
+function isFabRouteAllowed(segments: string[]) {
    if (!segments.includes('(home)')) {
       return false;
    }
 
-   if (segments.some((segment) => HIDDEN_SEGMENT_NAMES.has(segment))) {
-      return false;
-   }
-
-   return isHomeIndexRoute(segments) || isInsideCollectionStack(segments);
+   return !segments.some((segment) => HIDDEN_SEGMENT_NAMES.has(segment));
 }
 
 export function HomeFabProvider({ children }: { children: ReactNode }) {
    const segments = useSegments();
-   const visible = useHomeFabVisible(segments);
-   const onCollectionScreen = isInsideCollectionStack(segments);
+   const routeAllowed = isFabRouteAllowed(segments);
+   const [registration, setRegistration] = useState<FabRegistration | null>(null);
    const { fabTranslateY, showFab, onFabScroll } = useFabScrollHide();
    const transitionScale = useSharedValue(1);
 
+   const registerFab = useCallback((next: FabRegistration | null) => {
+      setRegistration(next);
+   }, []);
+
+   const fabActions = registration?.actions ?? [];
+   const actionKey = fabActions.map((action) => action.id).join(',');
+
+   const visible =
+      routeAllowed && fabActions.length > 0;
+
    useEffect(() => {
-      if (!onCollectionScreen) {
+      if (!visible || !actionKey) {
          return;
       }
+
       transitionScale.value = withSequence(
          withSpring(0.9, FAB_SPRING),
          withSpring(1, FAB_SPRING),
       );
-   }, [onCollectionScreen, transitionScale]);
-
-   const fabActions = useMemo<FabAction[]>(
-      () => [
-         {
-            id: 'profile',
-            icon: <PlatformIcon name={AvailableIcons.profile} size={22} />,
-            accessibilityLabel: 'Profile',
-            onPress: () => router.push('/(home)/(profile)'),
-         },
-         {
-            id: 'friends',
-            icon: <PlatformIcon name={AvailableIcons.friends} size={22} />,
-            accessibilityLabel: 'Friends',
-            onPress: () => {},
-         },
-         {
-            id: 'compose',
-            icon: <PlatformIcon name={AvailableIcons.compose} size={22} />,
-            accessibilityLabel: 'Compose',
-            onPress: () => router.push('/(home)/compose'),
-         },
-         {
-            id: 'add-item',
-            icon: <PlatformIcon name={AvailableIcons.camera} size={22} />,
-            accessibilityLabel: 'Add item',
-            onPress: () => router.push('/(home)/(camera)'),
-         },
-      ],
-      [],
-   );
+   }, [actionKey, transitionScale, visible]);
 
    const contextValue = useMemo(
       () => ({
          onFabScroll,
          showFab,
+         registerFab,
       }),
-      [onFabScroll, showFab],
+      [onFabScroll, registerFab, showFab],
    );
 
    const fabAnimatedStyle = useAnimatedStyle(() => ({
       opacity: visible ? 1 : 0,
-      transform: [{ scale: transitionScale.value }],
    }));
 
    return (
@@ -137,17 +89,26 @@ export function HomeFabProvider({ children }: { children: ReactNode }) {
          {children}
          <Animated.View
             pointerEvents={visible ? 'box-none' : 'none'}
-            style={[fabAnimatedStyle, { zIndex: 10 }]}
+            style={[styles.fabHost, fabAnimatedStyle]}
          >
             <FloatingActionButton
+               key={actionKey}
                actions={fabActions}
                scrollTranslateY={fabTranslateY}
+               transitionScale={transitionScale}
                onMainPress={showFab}
             />
          </Animated.View>
       </HomeFabContext.Provider>
    );
 }
+
+const styles = StyleSheet.create({
+   fabHost: {
+      ...StyleSheet.absoluteFillObject,
+      zIndex: 10,
+   },
+});
 
 export function useHomeFab() {
    const context = useContext(HomeFabContext);
@@ -157,4 +118,19 @@ export function useHomeFab() {
    }
 
    return context;
+}
+
+/**
+ * Registers FAB actions while this screen is focused. Clears on blur.
+ * Call from any screen inside `(home)` that should show the FAB.
+ */
+export function useFabActions(actions: FabAction[]) {
+   const { registerFab } = useHomeFab();
+
+   useFocusEffect(
+      useCallback(() => {
+         registerFab({ actions });
+         return () => registerFab(null);
+      }, [actions, registerFab]),
+   );
 }

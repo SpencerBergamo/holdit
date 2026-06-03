@@ -1,7 +1,8 @@
-import PlatformIcon, { AvailableIcons } from '@/components/PlatformIcon';
 import ProductCard from '@/components/saves/product-card';
-import { useHomeFab } from '@/contexts/HomeFabContext';
+import PlatformIcon, { AvailableIcons } from '@/components/PlatformIcon';
+import { useFabActions, useHomeFab } from '@/contexts/HomeFabContext';
 import { useMyTheme } from '@/contexts/MyThemeContext';
+import { useCollectionFabActions } from '@/hooks/use-collection-fab-actions';
 import { useCollection } from '@/hooks/use-collection';
 import { useCollectionSaves } from '@/hooks/use-collection-saves';
 import type { Save } from '@/types/save';
@@ -25,6 +26,8 @@ const GRID_GAP = 10;
 export default function CollectionScreen() {
    const { colors, spacing } = useMyTheme();
    const { onFabScroll } = useHomeFab();
+   const fabActions = useCollectionFabActions();
+   useFabActions(fabActions);
    const { width: windowWidth } = useWindowDimensions();
    const params = useLocalSearchParams<{ 'collection-id': string }>();
    const collectionId = params['collection-id'];
