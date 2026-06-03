@@ -36,6 +36,10 @@ export type ProductSnapshot = {
   primary_url: string | null;
   merchant_links: ProductLink[];
   specs: Record<string, string>;
+  /** Whole currency units in minor units (e.g. cents) when known from extraction. */
+  price_cents: number | null;
+  /** ISO 4217 code; defaults to USD in formatters when null. */
+  currency: string | null;
 };
 
 /** Structured variant choices; user edits win over AI pre-fill (CONTEXT.md). */

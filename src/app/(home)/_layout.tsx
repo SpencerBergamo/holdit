@@ -1,4 +1,5 @@
 import PlatformIcon, { AvailableIcons } from "@/components/PlatformIcon";
+import { HomeFabProvider } from "@/contexts/HomeFabContext";
 import { router, Stack } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
 
@@ -25,51 +26,58 @@ function HomeHeaderActions() {
 
 export default function HomeLayout() {
    return (
-      <Stack
-         screenOptions={{
-            headerShown: true,
-            headerShadowVisible: false,
-            headerBackButtonDisplayMode: "minimal",
-            headerLargeTitleShadowVisible: false,
-            headerLargeTitle: true,
-         }}
-      >
-         <Stack.Screen
-            name="index"
-            options={{
-               title: "HoldIt",
-               headerRight: () => <HomeHeaderActions />,
-            }}
-         />
-
-         <Stack.Screen
-            name="(profile)"
-            options={{
-               headerShown: false,
-               headerTransparent: true,
-               presentation: "modal",
-            }}
-         />
-
-         <Stack.Screen
-            name="(camera)"
-            options={{
-               headerShown: false,
-               presentation: "fullScreenModal",
-               animation: "fade",
-            }}
-         />
-
-         <Stack.Screen
-            name="compose"
-            options={{
+      <HomeFabProvider>
+         <Stack
+            screenOptions={{
                headerShown: true,
-               headerTitle: "",
-               headerLargeTitle: false,
-               presentation: "modal",
-               headerTransparent: true,
+               headerShadowVisible: false,
+               headerBackButtonDisplayMode: "minimal",
+               headerLargeTitleShadowVisible: false,
+               headerLargeTitle: true,
             }}
-         />
-      </Stack>
+         >
+            <Stack.Screen
+               name="index"
+               options={{
+                  title: "HoldIt",
+                  headerRight: () => <HomeHeaderActions />,
+               }}
+            />
+
+            <Stack.Screen
+               name="(profile)"
+               options={{
+                  headerShown: false,
+                  headerTransparent: true,
+                  presentation: "modal",
+               }}
+            />
+
+            <Stack.Screen
+               name="(camera)"
+               options={{
+                  headerShown: false,
+                  presentation: "fullScreenModal",
+                  animation: "fade",
+               }}
+            />
+
+            <Stack.Screen
+               name="[collection-id]"
+               options={{ headerShown: false }}
+            />
+
+            <Stack.Screen
+               name="compose"
+               options={{
+                  headerShown: true,
+                  headerTitle: "",
+                  headerLargeTitle: false,
+                  presentation: "modal",
+                  headerTransparent: true,
+               }}
+            />
+         </Stack>
+      </HomeFabProvider>
    );
 }

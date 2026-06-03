@@ -10,12 +10,14 @@ import {
    ViewStyle,
 } from "react-native";
 import Animated, {
+   Easing,
    runOnJS,
    SharedValue,
    useAnimatedReaction,
    useAnimatedStyle,
    useSharedValue,
    withSpring,
+   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -32,6 +34,18 @@ const SPRING_CONFIG = {
    stiffness: 190,
    mass: 0.9,
    overshootClamping: true,
+};
+
+const BACKDROP_MAX_OPACITY = 0.14;
+
+const BACKDROP_OPEN_TIMING = {
+   duration: 240,
+   easing: Easing.out(Easing.cubic),
+};
+
+const BACKDROP_CLOSE_TIMING = {
+   duration: 340,
+   easing: Easing.inOut(Easing.quad),
 };
 
 function triggerToggleHaptic() {
@@ -57,6 +71,8 @@ export type FloatingActionButtonProps = {
    bottomOffset?: number;
    /** Vertical offset driven by list scroll position in the parent screen. */
    scrollTranslateY?: SharedValue<number>;
+   /** Brief scale pulse when actions change (parent-driven). */
+   transitionScale?: SharedValue<number>;
    style?: StyleProp<ViewStyle>;
 };
 
@@ -126,20 +142,35 @@ export default function FloatingActionButton({
    onMainPress,
    bottomOffset = 24,
    scrollTranslateY,
+   transitionScale,
    style,
 }: FloatingActionButtonProps) {
    const { colors } = useMyTheme();
    const insets = useSafeAreaInsets();
    const [open, setOpen] = useState(false);
+   const [backdropInteractive, setBackdropInteractive] = useState(false);
    const progress = useSharedValue(0);
+   const backdropProgress = useSharedValue(0);
 
    const setExpanded = useCallback(
       (nextOpen: boolean) => {
          setOpen(nextOpen);
+
+         if (nextOpen) {
+            setBackdropInteractive(true);
+            backdropProgress.value = withTiming(1, BACKDROP_OPEN_TIMING);
+         } else {
+            backdropProgress.value = withTiming(0, BACKDROP_CLOSE_TIMING, (finished) => {
+               if (finished) {
+                  runOnJS(setBackdropInteractive)(false);
+               }
+            });
+         }
+
          progress.value = withSpring(nextOpen ? 1 : 0, SPRING_CONFIG);
          onToggle?.(nextOpen);
       },
-      [onToggle, progress],
+      [backdropProgress, onToggle, progress],
    );
 
    const toggle = useCallback(() => {
@@ -181,28 +212,39 @@ export default function FloatingActionButton({
    }));
 
    const backdropStyle = useAnimatedStyle(() => ({
-      opacity: progress.value * 0.2,
+      opacity: backdropProgress.value * backdropProgress.value * BACKDROP_MAX_OPACITY,
    }));
 
    const clusterScrollStyle = useAnimatedStyle(() => {
-      if (!scrollTranslateY) {
+      const transform: (
+         | { scale: number }
+         | { translateY: number }
+      )[] = [];
+
+      if (transitionScale) {
+         transform.push({ scale: transitionScale.value });
+      }
+
+      if (scrollTranslateY) {
+         transform.push({ translateY: scrollTranslateY.value });
+      }
+
+      if (transform.length === 0) {
          return {};
       }
-      return {
-         transform: [{ translateY: scrollTranslateY.value }],
-      };
-   }, [scrollTranslateY]);
+
+      return { transform };
+   }, [scrollTranslateY, transitionScale]);
 
    return (
       <View pointerEvents="box-none" style={[styles.overlay, style]}>
-         {open ? (
-            <AnimatedPressable
-               accessibilityRole="button"
-               accessibilityLabel="Close menu"
-               onPress={close}
-               style={[styles.backdrop, backdropStyle]}
-            />
-         ) : null}
+         <AnimatedPressable
+            accessibilityRole="button"
+            accessibilityLabel="Close menu"
+            onPress={close}
+            pointerEvents={backdropInteractive ? 'auto' : 'none'}
+            style={[styles.backdrop, backdropStyle]}
+         />
 
          <Animated.View
             pointerEvents="box-none"
