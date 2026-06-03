@@ -1,6 +1,7 @@
 import MyTextInput from "@/components/common/MyTextInput";
 import PlatformIcon, { AvailableIcons } from "@/components/PlatformIcon";
 import { useMyTheme } from "@/contexts/MyThemeContext";
+import { createCollection } from "@/lib/collections";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
@@ -9,6 +10,7 @@ import { router, Stack, useNavigation } from "expo-router";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
+   ActivityIndicator,
    Alert,
    Pressable,
    StyleSheet,
@@ -174,6 +176,7 @@ export default function ComposeScreen() {
    const [photoUri, setPhotoUri] = useState<string | null>(null);
    const [captureError, setCaptureError] = useState<string | undefined>();
    const [pickingPhoto, setPickingPhoto] = useState(false);
+   const [saving, setSaving] = useState(false);
    const urlRef = useRef<TextInput>(null);
 
    const {
@@ -289,17 +292,35 @@ export default function ComposeScreen() {
             return;
          }
 
-         void Haptics.notificationAsync(
-            Haptics.NotificationFeedbackType.Success,
-         );
-
          if (mode === "collection") {
-            // TODO: create collection via API
-            router.back();
+            setSaving(true);
+            try {
+               await createCollection({
+                  name: data.collectionName,
+                  description: data.collectionDescription.trim() || null,
+                  visible_to_friends: data.collectionVisibleToFriends,
+               });
+
+               void Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Success,
+               );
+               router.back();
+            } catch (e) {
+               const message =
+                  e instanceof Error
+                     ? e.message
+                     : "Unable to create collection.";
+               Alert.alert("Unable to save", message);
+            } finally {
+               setSaving(false);
+            }
             return;
          }
 
          // TODO: create Save from URL and/or photo capture
+         void Haptics.notificationAsync(
+            Haptics.NotificationFeedbackType.Success,
+         );
          router.back();
       },
       [mode, photoUri, setError, trigger],
@@ -325,31 +346,31 @@ export default function ComposeScreen() {
                <PlatformIcon name={AvailableIcons.close} size={24} />
             </TouchableOpacity>
          ),
-         headerRight: () => (
-            <TouchableOpacity
-               onPress={() => {
-                  if (!canSave) {
-                     return;
-                  }
-                  void handleSubmit(onSave)();
-               }}
-               disabled={!canSave}
-               style={{ opacity: canSave ? 1 : 0.4 }}
-               accessibilityRole="button"
-               accessibilityLabel="Save"
-               accessibilityState={{ disabled: !canSave }}
-            >
-               <PlatformIcon
-                  name={AvailableIcons.checkmark}
-                  size={24}
-                  color={canSave ? colors.primary : colors.textMuted}
-               />
-            </TouchableOpacity>
-         ),
+         headerRight: () =>
+            saving ? (
+               <ActivityIndicator size="small" />
+            ) : (
+               <TouchableOpacity
+                  onPress={() => {
+                     if (!canSave) {
+                        return;
+                     }
+                     void handleSubmit(onSave)();
+                  }}
+                  disabled={!canSave}
+                  style={{ opacity: canSave ? 1 : 0.4 }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Save"
+                  accessibilityState={{ disabled: !canSave }}
+               >
+                  <Text style={{ fontSize: 17, fontWeight: "600", color: canSave ? colors.primary : colors.textMuted, marginHorizontal: 12 }}>Save</Text>
+               </TouchableOpacity>
+            ),
       });
    }, [
       navigation,
       canSave,
+      saving,
       colors.primary,
       colors.textMuted,
       handleSubmit,
@@ -401,8 +422,9 @@ export default function ComposeScreen() {
                            value={value}
                            onChangeText={onChange}
                            onBlur={onBlur}
-                           autoCapitalize="sentences"
-                           returnKeyType="next"
+                           autoCapitalize="words"
+                           returnKeyType="done"
+                           autoCorrect
                            error={errors.collectionName?.message}
                         />
                      )}
