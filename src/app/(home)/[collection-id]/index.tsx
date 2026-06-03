@@ -1,8 +1,7 @@
-import ProductCard from '@/components/saves/product-card';
 import PlatformIcon, { AvailableIcons } from '@/components/PlatformIcon';
+import ProductCard from '@/components/saves/product-card';
 import { useFabActions, useHomeFab } from '@/contexts/HomeFabContext';
 import { useMyTheme } from '@/contexts/MyThemeContext';
-import { useCollectionFabActions } from '@/hooks/use-collection-fab-actions';
 import { useCollection } from '@/hooks/use-collection';
 import { useCollectionSaves } from '@/hooks/use-collection-saves';
 import type { Save } from '@/types/save';
@@ -26,11 +25,24 @@ const GRID_GAP = 10;
 export default function CollectionScreen() {
    const { colors, spacing } = useMyTheme();
    const { onFabScroll } = useHomeFab();
-   const fabActions = useCollectionFabActions();
-   useFabActions(fabActions);
    const { width: windowWidth } = useWindowDimensions();
    const params = useLocalSearchParams<{ 'collection-id': string }>();
    const collectionId = params['collection-id'];
+
+   useFabActions(useMemo(() => [
+      {
+         id: 'compose',
+         icon: <PlatformIcon name={AvailableIcons.compose} size={22} />,
+         accessibilityLabel: 'Compose',
+         onPress: () => router.push('/(home)/compose'),
+      },
+      {
+         id: 'camera',
+         icon: <PlatformIcon name={AvailableIcons.camera} size={22} />,
+         accessibilityLabel: 'Add item',
+         onPress: () => router.push('/(home)/(camera)'),
+      },
+   ], []));
 
    const {
       collection,
