@@ -13,71 +13,96 @@ interface PlatformIconProps {
 }
 
 export const enum AvailableIcons {
-    profile = 'profile',
-    eye = 'eye',
-    eyeOff = 'eyeOff',
+    // Navigation
+    back = 'back',
+    close = 'close',
     menu = 'menu',
-    download = 'download',
-    share = 'share',
+
+    // Actions
     plus = 'plus',
     compose = 'compose',
-    home = 'home',
-    homeFill = 'homeFill',
     search = 'search',
     filter = 'filter',
-    camera = 'camera',
-    close = 'close',
-    settings = 'settings',
-    appearance = 'appearance',
-    bell = 'bell',
-    moon = 'moon',
+    download = 'download',
+    share = 'share',
+    replay = 'replay',
+    flip = 'flip',
+    checkmark = 'checkmark',
+
+    // User & Social
+    profile = 'profile',
+    friends = 'friends',
+    logout = 'logout',
+
+    // Auth & Security
+    eye = 'eye',
+    eyeOff = 'eyeOff',
     lock = 'lock',
     shield = 'shield',
-    help = 'help',
+
+    // Communication
+    bell = 'bell',
     mail = 'mail',
-    logout = 'logout',
-    friends = 'friends',
-    replay = 'replay',
-    checkmark = 'checkmark',
-    flip = 'flip',
-    tray = 'tray',
-    link = 'link',
+
+    // Content & Media
+    camera = 'camera',
     photo = 'photo',
+    link = 'link',
     gift = 'gift',
+    tray = 'tray',
+
+    // Settings & Preferences
+    settings = 'settings',
+    appearance = 'appearance',
+    moon = 'moon',
+    help = 'help',
 }
 
 const iconMap: Record<AvailableIcons, { ios: SFSymbol; android: keyof typeof MaterialIcons.glyphMap }> = {
-    profile: { ios: 'person.circle', android: 'person' },
-    eye: { ios: 'eye', android: 'visibility' },
-    eyeOff: { ios: 'eye.slash', android: 'visibility-off' },
+
+    // Navigation
+    back: { ios: 'chevron.left', android: 'arrow-back' },
+    close: { ios: 'xmark', android: 'close' },
     menu: { ios: 'info.circle', android: 'menu' },
-    download: { ios: 'square.and.arrow.down', android: 'download' },
-    share: { ios: 'square.and.arrow.up', android: 'share' },
+
+    // Actions
     plus: { ios: 'plus', android: 'add' },
     compose: { ios: 'square.and.pencil', android: 'create' },
-    home: { ios: 'house', android: 'home' },
-    homeFill: { ios: 'house.fill', android: 'home' },
     search: { ios: 'magnifyingglass', android: 'search' },
     filter: { ios: 'line.3.horizontal.decrease', android: 'filter' },
-    camera: { ios: 'camera', android: 'photo-camera' },
-    close: { ios: 'xmark', android: 'close' },
-    settings: { ios: 'gearshape', android: 'settings' },
-    appearance: { ios: 'paintbrush', android: 'palette' },
-    bell: { ios: 'bell', android: 'notifications' },
-    moon: { ios: 'moon', android: 'dark-mode' },
+    download: { ios: 'square.and.arrow.down', android: 'download' },
+    share: { ios: 'square.and.arrow.up', android: 'share' },
+    replay: { ios: 'arrow.counterclockwise', android: 'replay' },
+    flip: { ios: 'arrow.triangle.2.circlepath', android: 'flip' },
+    checkmark: { ios: 'checkmark', android: 'check' },
+
+    // User & Social
+    profile: { ios: 'person.circle', android: 'person' },
+    friends: { ios: 'person.badge.plus', android: 'people' },
+    logout: { ios: 'rectangle.portrait.and.arrow.right', android: 'logout' },
+
+    // Auth & Security
+    eye: { ios: 'eye', android: 'visibility' },
+    eyeOff: { ios: 'eye.slash', android: 'visibility-off' },
     lock: { ios: 'lock', android: 'lock' },
     shield: { ios: 'hand.raised', android: 'security' },
-    help: { ios: 'questionmark.circle', android: 'help-outline' },
+
+    // Communication
+    bell: { ios: 'bell', android: 'notifications' },
     mail: { ios: 'envelope', android: 'mail' },
-    logout: { ios: 'rectangle.portrait.and.arrow.right', android: 'logout' },
-    friends: { ios: 'person.badge.plus', android: 'people' },
-    replay: { ios: 'arrow.counterclockwise', android: 'replay' },
-    checkmark: { ios: 'checkmark', android: 'check' },
-    flip: { ios: 'arrow.triangle.2.circlepath', android: 'flip' },
-    tray: { ios: 'tray', android: 'inbox' },
-    link: { ios: 'link', android: 'link' },
+
+    // Content & Media
+    camera: { ios: 'camera', android: 'photo-camera' },
     photo: { ios: 'photo.on.rectangle.angled', android: 'photo-library' },
+    link: { ios: 'link', android: 'link' },
     gift: { ios: 'gift', android: 'cake' },
+    tray: { ios: 'tray', android: 'inbox' },
+
+    // Settings & Preferences
+    settings: { ios: 'gearshape', android: 'settings' },
+    appearance: { ios: 'paintbrush', android: 'palette' },
+    moon: { ios: 'moon', android: 'dark-mode' },
+    help: { ios: 'questionmark.circle', android: 'help-outline' },
 }
 
 

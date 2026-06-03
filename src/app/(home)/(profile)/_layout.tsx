@@ -5,7 +5,7 @@ export default function ProfileLayout() {
       <Stack
          screenOptions={{
             headerShown: true,
-            headerShadowVisible: false,
+            headerShadowVisible: true,
             headerBackButtonDisplayMode: "minimal",
             headerLargeTitle: false,
          }}

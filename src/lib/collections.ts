@@ -138,3 +138,45 @@ export async function createCollection(
 
   return data;
 }
+
+/**
+ * Loads a single collection by id for the signed-in user (RLS-scoped).
+ */
+export async function fetchCollectionById(
+  collectionId: string,
+): Promise<Collection | null> {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError) {
+    throw userError;
+  }
+
+  if (!user) {
+    throw new Error('You must be signed in to view collections.');
+  }
+
+  const { data, error } = await supabase
+    .from('collections')
+    .select(
+      `
+      id,
+      owner_id,
+      name,
+      description,
+      visible_to_friends,
+      created_at,
+      updated_at
+    `,
+    )
+    .eq('id', collectionId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
