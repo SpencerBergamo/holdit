@@ -50,6 +50,7 @@ export const enum AvailableIcons {
     link = 'link',
     gift = 'gift',
     tray = 'tray',
+    clipboard = 'clipboard',
 
     // Settings & Preferences
     settings = 'settings',
@@ -97,6 +98,7 @@ const iconMap: Record<AvailableIcons, { ios: SFSymbol; android: keyof typeof Mat
     link: { ios: 'link', android: 'link' },
     gift: { ios: 'gift', android: 'cake' },
     tray: { ios: 'tray', android: 'inbox' },
+    clipboard: { ios: 'list.clipboard', android: 'content-paste' },
 
     // Settings & Preferences
     settings: { ios: 'gearshape', android: 'settings' },

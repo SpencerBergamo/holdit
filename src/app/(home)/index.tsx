@@ -1,53 +1,23 @@
-import PlatformIcon, { AvailableIcons } from "@/components/PlatformIcon";
 import WishlistCard from "@/components/WishlistCard";
-import { useFabActions } from "@/contexts/HomeFabContext";
 import { useMyTheme } from "@/contexts/MyThemeContext";
-import { useFabScrollHide } from "@/hooks/use-fab-scroll-hide";
 import { useMyCollections } from "@/hooks/use-my-collections";
-import { useSearch } from "@/hooks/use-search";
 import type { CollectionWithSaveCount } from "@/types/collection";
 import { FlashList, ListRenderItem } from "@shopify/flash-list";
 import { router } from "expo-router";
-import { useCallback, useMemo } from "react";
+import { Stack } from "expo-router/stack";
+import { useCallback, useMemo, useState } from "react";
 import {
    ActivityIndicator,
    Pressable,
    RefreshControl,
    StyleSheet,
    Text,
-   View,
+   View
 } from "react-native";
 
 export default function HomeScreen() {
    const { colors, spacing } = useMyTheme();
-   const { onFabScroll } = useFabScrollHide();
-
-   useFabActions(useMemo(() => [
-      {
-         id: 'profile',
-         icon: <PlatformIcon name={AvailableIcons.profile} size={22} />,
-         accessibilityLabel: 'Profile',
-         onPress: () => router.push('/(home)/(profile)'),
-      },
-      {
-         id: 'friends',
-         icon: <PlatformIcon name={AvailableIcons.friends} size={22} />,
-         accessibilityLabel: 'Friends',
-         onPress: () => { },
-      },
-      {
-         id: 'compose',
-         icon: <PlatformIcon name={AvailableIcons.compose} size={22} />,
-         accessibilityLabel: 'Compose',
-         onPress: () => router.push('/(home)/compose'),
-      },
-      {
-         id: 'camera',
-         icon: <PlatformIcon name={AvailableIcons.camera} size={22} />,
-         accessibilityLabel: 'Add item',
-         onPress: () => router.push('/(home)/(camera)'),
-      },
-   ], []));
+   const [search, setSearch] = useState("");
 
    const {
       collections,
@@ -56,12 +26,6 @@ export default function HomeScreen() {
       error,
       refresh,
    } = useMyCollections();
-
-   const search = useSearch({
-      placeholder: "Search wishlists",
-      hideWhenScrolling: false,
-      placement: "stacked",
-   });
 
    const horizontalPadding = spacing.m;
 
@@ -79,7 +43,7 @@ export default function HomeScreen() {
       () => ({
          paddingHorizontal: horizontalPadding,
          paddingTop: spacing.s,
-         paddingBottom: spacing.xl * 3,
+         paddingBottom: spacing.xl,
       }),
       [horizontalPadding, spacing.s, spacing.xl],
    );
@@ -184,29 +148,67 @@ export default function HomeScreen() {
    ]);
 
    return (
-      <FlashList
-         data={filteredCollections}
-         keyExtractor={(item) => item.id}
-         renderItem={renderCollection}
-         refreshControl={
-            <RefreshControl
-               refreshing={isRefreshing}
-               onRefresh={() => void refresh()}
-               tintColor={colors.primary}
+      <>
+         <FlashList
+            data={filteredCollections}
+            keyExtractor={(item) => item.id}
+            renderItem={renderCollection}
+            refreshControl={
+               <RefreshControl
+                  refreshing={isRefreshing}
+                  onRefresh={() => void refresh()}
+                  tintColor={colors.primary}
+               />
+            }
+            scrollEnabled={true}
+            bounces={true}
+            alwaysBounceVertical={true}
+            overScrollMode={"auto"}
+            contentInsetAdjustmentBehavior="automatic"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={listContentStyle}
+            ListEmptyComponent={listEmpty}
+            style={{ flex: 1, backgroundColor: colors.background }}
+         />
+
+         <Stack.Screen.Title large>HoldIt</Stack.Screen.Title>
+
+         <Stack.SearchBar
+            placeholder="Search wishlists"
+            onChangeText={(event) => setSearch(event.nativeEvent.text)}
+         />
+
+         <Stack.Toolbar placement="right">
+            <Stack.Toolbar.Button icon="tray" onPress={() => { }} />
+            <Stack.Toolbar.Button
+               icon="person.circle"
+               onPress={() => router.push("/(home)/(profile)")}
             />
-         }
-         onScroll={onFabScroll}
-         scrollEventThrottle={16}
-         scrollEnabled={true}
-         bounces={true}
-         alwaysBounceVertical={true}
-         overScrollMode={"auto"}
-         contentInsetAdjustmentBehavior="automatic"
-         showsVerticalScrollIndicator={false}
-         contentContainerStyle={listContentStyle}
-         ListEmptyComponent={listEmpty}
-         style={{ flex: 1, backgroundColor: colors.background }}
-      />
+         </Stack.Toolbar>
+
+         <Stack.Toolbar placement="bottom">
+            <Stack.Toolbar.SearchBarSlot />
+            <Stack.Toolbar.Spacer />
+            <Stack.Toolbar.Menu icon="plus">
+               <Stack.Toolbar.MenuAction
+                  icon="plus"
+                  onPress={() => router.push("/(home)/new-product")}
+               >
+                  <Stack.Toolbar.Label>
+                     New Product
+                  </Stack.Toolbar.Label>
+               </Stack.Toolbar.MenuAction>
+               <Stack.Toolbar.MenuAction
+                  icon="square.and.pencil"
+                  onPress={() => router.push("/(home)/new-collection")}
+               >
+                  <Stack.Toolbar.Label>
+                     New Collection
+                  </Stack.Toolbar.Label>
+               </Stack.Toolbar.MenuAction>
+            </Stack.Toolbar.Menu>
+         </Stack.Toolbar>
+      </>
    );
 }
 
@@ -235,6 +237,22 @@ const styles = StyleSheet.create({
    },
    retryLabel: {
       fontSize: 15,
+      fontWeight: "600",
+   },
+
+
+   newCollectionButtonContainer: {
+      alignItems: "center",
+   },
+   newCollectionButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      paddingVertical: 8,
+      paddingHorizontal: 4,
+   },
+   newCollectionLabel: {
+      fontSize: 17,
       fontWeight: "600",
    },
 });

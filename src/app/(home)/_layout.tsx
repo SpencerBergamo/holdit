@@ -1,32 +1,7 @@
-import PlatformIcon, { AvailableIcons } from "@/components/PlatformIcon";
-import { HomeFabProvider } from "@/contexts/HomeFabContext";
-import { router, Stack } from "expo-router";
-import { TouchableOpacity, View } from "react-native";
-
-function HomeHeaderActions() {
-   return (
-      <View style={{ flexDirection: "row", gap: 18, marginHorizontal: 12 }}>
-         <TouchableOpacity
-            onPress={() => { }}
-            accessibilityRole="button"
-            accessibilityLabel="Inbox"
-         >
-            <PlatformIcon name={AvailableIcons.tray} size={22} />
-         </TouchableOpacity>
-         <TouchableOpacity
-            onPress={() => router.push("/(home)/(profile)")}
-            accessibilityRole="button"
-            accessibilityLabel="Notifications"
-         >
-            <PlatformIcon name={AvailableIcons.profile} size={22} />
-         </TouchableOpacity>
-      </View>
-   );
-}
+import { Stack } from "expo-router";
 
 export default function HomeLayout() {
    return (
-      <HomeFabProvider>
          <Stack
             screenOptions={{
                headerShown: true,
@@ -36,13 +11,8 @@ export default function HomeLayout() {
                headerLargeTitle: true,
             }}
          >
-            <Stack.Screen
-               name="index"
-               options={{
-                  title: "HoldIt",
-                  headerRight: () => <HomeHeaderActions />,
-               }}
-            />
+
+            <Stack.Screen name="index" />
 
             <Stack.Screen
                name="(profile)"
@@ -77,7 +47,29 @@ export default function HomeLayout() {
                   headerTransparent: true,
                }}
             />
+
+            <Stack.Screen
+               name="new-collection"
+               options={{
+                  headerShown: true,
+                  headerTitle: "New Collection",
+                  headerLargeTitle: false,
+                  presentation: "modal",
+                  headerTransparent: true,
+               }}
+            />
+
+            <Stack.Screen
+               name="new-product"
+               options={{
+                  headerShown: true,
+                  headerTitle: "New Product",
+                  headerLargeTitle: false,
+                  presentation: "modal",
+                  headerTransparent: true,
+               }}
+            />
+
          </Stack>
-      </HomeFabProvider>
    );
 }
