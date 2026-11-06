@@ -156,8 +156,7 @@ export default function CameraScreen() {
             <SymbolView name="camera" size={48} tintColor="white" />
             <Text style={styles.permissionTitle}>Camera access needed</Text>
             <Text style={styles.permissionBody}>
-               HoldIt uses the camera to snap items you want on your wishlists. We
-               only upload a photo when you save it to a list.
+               HoldIt uses the camera to snap items you want on your wishlists.
             </Text>
             {canAskAgain ? (
                <Pressable
@@ -263,15 +262,9 @@ export default function CameraScreen() {
       setCaptured(null);
    };
 
-   const handleContinueToCollection = () => {
-      if (!captured?.uri) {
-         return;
-      }
+   const handleDone = () => {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      router.push({
-         pathname: "/(home)/(camera)/choose-collection",
-         params: { photoUri: captured.uri },
-      });
+      router.back();
    };
 
    // ── Review mode ────────────────────────────────────────────────────────────
@@ -312,15 +305,15 @@ export default function CameraScreen() {
                />
 
                <Pressable
-                  onPress={handleContinueToCollection}
+                  onPress={handleDone}
                   accessibilityRole="button"
-                  accessibilityLabel="Choose wishlist to save this photo"
+                  accessibilityLabel="Close camera"
                   style={({ pressed }) => [
-                     styles.saveBtn,
+                     styles.doneBtn,
                      { opacity: pressed ? 0.85 : 1 },
                   ]}
                >
-                  <Text style={styles.saveBtnText}>Choose wishlist</Text>
+                  <Text style={styles.doneBtnText}>Done</Text>
                </Pressable>
 
                <View style={styles.glassBtn} />
@@ -345,7 +338,7 @@ export default function CameraScreen() {
                <Text style={styles.simulatorTitle}>No live preview here</Text>
                <Text style={styles.simulatorBody}>
                   {__DEV__
-                     ? "Simulators don’t have a camera. Use “Take photo” below with a mock image to test saving, or run on a device."
+                     ? "Simulators don’t have a camera. Tap the shutter below for a mock preview, or run on a device."
                      : "Use a physical device to capture products. Simulators don’t provide a camera."}
                </Text>
                {__DEV__ ? (
@@ -544,7 +537,7 @@ const styles = StyleSheet.create({
       justifyContent: "space-between",
       paddingHorizontal: 32,
    },
-   saveBtn: {
+   doneBtn: {
       flex: 1,
       marginHorizontal: 16,
       paddingVertical: 16,
@@ -553,7 +546,7 @@ const styles = StyleSheet.create({
       alignItems: "center",
       justifyContent: "center",
    },
-   saveBtnText: {
+   doneBtnText: {
       fontSize: 16,
       fontWeight: "700",
       color: "#000",
