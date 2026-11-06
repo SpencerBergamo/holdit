@@ -32,6 +32,10 @@ describe('extract-product-tool', () => {
       size: '600ml',
       color: 'Matte black',
       quantity: 1,
+      category: {
+        taxonomy: 'google_product',
+        path: ['Home & Garden', 'Kitchen & Dining', 'Cookware', 'Kettles'],
+      },
     });
 
     expect(result).toEqual({
@@ -45,6 +49,12 @@ describe('extract-product-tool', () => {
           { url: 'https://shop.example/kettle', label: 'Example Shop' },
         ],
         specs: { brand: 'Hario', material: 'Stainless steel' },
+        price_cents: null,
+        currency: null,
+        category: {
+          taxonomy: 'google_product',
+          path: ['Home & Garden', 'Kitchen & Dining', 'Cookware', 'Kettles'],
+        },
       },
       variant_details: {
         size: '600ml',
@@ -52,6 +62,27 @@ describe('extract-product-tool', () => {
         quantity: 1,
       },
     });
+  });
+
+  it('rejects a valid product when category path[0] is not a Google top-level name', () => {
+    expect(() =>
+      parseExtractProductFunctionCall({
+        is_valid_product: true,
+        rejection_reason: null,
+        title: 'Thing',
+        images: [],
+        primary_url: null,
+        merchant_links: [],
+        specs: {},
+        size: null,
+        color: null,
+        quantity: null,
+        category: {
+          taxonomy: 'google_product',
+          path: ['Not A Real Category', 'Sub'],
+        },
+      }),
+    ).toThrow();
   });
 
   it('maps invalid URL captures with a rejection reason', () => {
@@ -66,6 +97,7 @@ describe('extract-product-tool', () => {
       size: null,
       color: null,
       quantity: null,
+      category: null,
     });
 
     expect(result.is_valid_product).toBe(false);

@@ -1,6 +1,10 @@
 import type { FunctionDeclaration } from '@google/genai';
 import { z } from 'zod';
 
+import {
+  productCategoryJsonSchemaProperty,
+  productCategorySchema,
+} from '@/lib/product-category';
 import type { ProductExtractionResult } from '@/types/product-extraction';
 import { EXTRACT_PRODUCT_FUNCTION_NAME } from '@/lib/gemini/constants';
 
@@ -50,6 +54,23 @@ export const extractProductArgsSchema = z.object({
     .nullable()
     .optional()
     .transform((value) => value ?? null),
+  category: productCategorySchema.nullable().optional().transform((value) => value ?? null),
+}).superRefine((value, ctx) => {
+  if (value.is_valid_product && !value.category) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'category is required when is_valid_product is true',
+      path: ['category'],
+    });
+  }
+
+  if (!value.is_valid_product && value.category !== null) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'category must be null when is_valid_product is false',
+      path: ['category'],
+    });
+  }
 });
 
 export type ExtractProductArgs = z.infer<typeof extractProductArgsSchema>;
@@ -123,6 +144,7 @@ export const extractProductFunctionDeclaration: FunctionDeclaration = {
         minimum: 1,
         description: 'Desired quantity when inferable from the capture.',
       },
+      ...productCategoryJsonSchemaProperty,
     },
   },
 };
@@ -139,6 +161,9 @@ export function mapExtractProductArgsToResult(
       primary_url: args.primary_url,
       merchant_links: args.merchant_links,
       specs: args.specs,
+      price_cents: null,
+      currency: null,
+      category: args.category,
     },
     variant_details: {
       size: args.size,

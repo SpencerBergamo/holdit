@@ -1,3 +1,5 @@
+import type { ProductCategory } from '@/types/product-category';
+
 /**
  * `saves` row and embedded JSON shapes (ADR 0001, ADR 0002).
  * Product data lives on the Save row—not a shared catalog. Gift claim and purchase
@@ -40,6 +42,8 @@ export type ProductSnapshot = {
   price_cents: number | null;
   /** ISO 4217 code; defaults to USD in formatters when null. */
   currency: string | null;
+  /** Google Product Taxonomy breadcrumb when known (issue #2). */
+  category: ProductCategory | null;
 };
 
 /** Structured variant choices; user edits win over AI pre-fill (CONTEXT.md). */

@@ -19,6 +19,10 @@ describe('extractProductFromCapture', () => {
             size: null,
             color: 'Black',
             quantity: null,
+            category: {
+              taxonomy: 'google_product',
+              path: ['Electronics', 'Audio', 'Headphones'],
+            },
           },
         },
       ],

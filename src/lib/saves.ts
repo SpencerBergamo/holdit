@@ -1,3 +1,4 @@
+import { parseProductCategory } from '@/lib/product-category';
 import type { Capture, ProductSnapshot, Save } from '@/types/save';
 import { supabase } from '@/utils/supabase';
 
@@ -9,6 +10,7 @@ const EMPTY_SNAPSHOT: ProductSnapshot = {
   specs: {},
   price_cents: null,
   currency: null,
+  category: null,
 };
 
 function parseProductSnapshot(value: unknown): ProductSnapshot {
@@ -61,6 +63,7 @@ function parseProductSnapshot(value: unknown): ProductSnapshot {
         ? raw.price_cents
         : null,
     currency: typeof raw.currency === 'string' ? raw.currency : null,
+    category: parseProductCategory(raw.category),
   };
 }
 

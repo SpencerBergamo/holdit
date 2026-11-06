@@ -9,8 +9,12 @@ The primary thing a user creates when they want something. Each Save triggers it
 _Avoid_: Shared product catalog; one Save per merchant listing; skipping AI/crawl because a URL was saved before; warning or blocking duplicate Saves for the same listing; Item (as the domain entity name)
 
 **Product snapshot**:
-Merchant-sourced product data stored on a single Save after resolution—title, images, links, specs. A snapshot at that Save's resolution time; fixed once resolution completes. HoldIt does not re-crawl or refresh an existing Save—merchant changes or a better URL require creating a new Save.
+Merchant-sourced product data stored on a single Save after resolution—title, images, links, specs, and **product category**. A snapshot at that Save's resolution time; fixed once resolution completes. HoldIt does not re-crawl or refresh an existing Save—merchant changes or a better URL require creating a new Save.
 _Avoid_: Merchant product (as a shared entity); catalog; deduplication; manual or automatic re-crawl on an existing Save
+
+**Product category**:
+Commerce classification on the product snapshot, required when resolution succeeds. Uses Google Product Taxonomy as a breadcrumb (`taxonomy: google_product`, `path` segments from broadest to specific—e.g. Electronics → Audio → Headphones). Covers fashion, tech, furniture, and other purchasables with one shared vocabulary for agents, filters, and future integrations. Decision tracked in [GitHub issue #2](https://github.com/SpencerBergamo/holdit/issues/2).
+_Avoid_: Free-text-only categories; skipping category on valid extractions; custom per-merchant category trees in v1
 
 **Variant details**:
 Per-Save attributes such as size, color, and quantity—extracted from the capture by AI/crawler or entered by the user. What distinguishes two Saves that point at the same merchant listing. AI may pre-fill values; the user's edits always win.

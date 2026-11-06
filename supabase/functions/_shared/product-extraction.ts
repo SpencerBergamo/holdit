@@ -6,6 +6,12 @@ import {
   type Part,
 } from '@google/genai';
 
+import {
+  buildProductCategoryExtractionRules,
+  parseProductCategory,
+  type ProductCategory,
+} from './product-category.ts';
+
 export const GEMINI_PRODUCT_MODEL = 'gemini-2.0-flash';
 export const EXTRACT_PRODUCT_FUNCTION_NAME = 'extract_product_details';
 
@@ -15,13 +21,14 @@ The user is saving something they want to buy to a personal wishlist. From their
 
 Rules:
 - is_valid_product must be false for non-product URLs (homepages, blogs, search results, category pages, cart/checkout pages without a single product).
-- For valid product captures, fill title and any variant hints (size, color, quantity) you can infer.
+- For valid product captures, fill title and any variant hints (size, color, quantity) you can infer, and you must always populate category (see below).
 - images should list direct image URLs when known (from URL context); leave empty for photo-only captures.
 - primary_url is the main merchant listing URL when known.
 - merchant_links lists alternate purchase links with optional retailer labels.
 - specs holds structured attributes (brand, material, model number, etc.) as string key-value pairs.
 - rejection_reason is required when is_valid_product is false; otherwise null.
-- Prefer null over guessing when a field is unknown.`;
+- Prefer null over guessing when a field is unknown.
+${buildProductCategoryExtractionRules()}`;
 
 export type ExtractProductInput =
   | { source_type: 'url'; url: string; notes?: string | null }
@@ -42,6 +49,9 @@ export type ProductExtractionResult = {
     primary_url: string | null;
     merchant_links: { url: string; label: string | null }[];
     specs: Record<string, string>;
+    price_cents: number | null;
+    currency: string | null;
+    category: ProductCategory | null;
   };
   variant_details: {
     size: string | null;
@@ -83,6 +93,51 @@ const extractProductFunctionDeclaration: FunctionDeclaration = {
       size: { type: 'string', nullable: true },
       color: { type: 'string', nullable: true },
       quantity: { type: 'integer', nullable: true, minimum: 1 },
+      category: {
+        type: 'object',
+        nullable: true,
+        additionalProperties: false,
+        required: ['taxonomy', 'path'],
+        description:
+          'Required when is_valid_product is true. path[0] must be one of Google’s 21 top-level taxonomy names (exact spelling).',
+        properties: {
+          taxonomy: { type: 'string', enum: ['google_product'] },
+          path: {
+            type: 'array',
+            minItems: 1,
+            maxItems: 7,
+            prefixItems: [
+              {
+                type: 'string',
+                enum: [
+                  'Animals & Pet Supplies',
+                  'Apparel & Accessories',
+                  'Arts & Entertainment',
+                  'Baby & Toddler',
+                  'Business & Industrial',
+                  'Cameras & Optics',
+                  'Electronics',
+                  'Food, Beverages & Tobacco',
+                  'Furniture',
+                  'Hardware',
+                  'Health & Beauty',
+                  'Home & Garden',
+                  'Luggage & Bags',
+                  'Mature',
+                  'Media',
+                  'Office Supplies',
+                  'Religious & Ceremonial',
+                  'Software',
+                  'Sporting Goods',
+                  'Toys & Games',
+                  'Vehicles & Parts',
+                ],
+              },
+            ],
+            items: { type: 'string', minLength: 1 },
+          },
+        },
+      },
     },
   },
 };
@@ -145,6 +200,16 @@ function parseExtractProductFunctionCall(args: unknown): ProductExtractionResult
     throw new Error('extract_product_details missing is_valid_product.');
   }
 
+  const category = parseProductCategory(record.category);
+
+  if (record.is_valid_product && !category) {
+    throw new Error('extract_product_details missing category for a valid product.');
+  }
+
+  if (!record.is_valid_product && category !== null) {
+    throw new Error('extract_product_details category must be null when invalid.');
+  }
+
   const merchantLinks = Array.isArray(record.merchant_links)
     ? record.merchant_links
         .filter(
@@ -177,6 +242,9 @@ function parseExtractProductFunctionCall(args: unknown): ProductExtractionResult
       primary_url: asNullableString(record.primary_url),
       merchant_links: merchantLinks,
       specs,
+      price_cents: null,
+      currency: null,
+      category,
     },
     variant_details: {
       size: asNullableString(record.size),
