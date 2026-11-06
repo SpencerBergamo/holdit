@@ -4,7 +4,8 @@ import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import * as Device from "expo-device";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import * as Haptics from "expo-haptics";
-import * as FileSystem from "expo-file-system";
+// import * as FileSystem from "expo-file-system";
+import { File } from "expo-file-system";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { SymbolView } from "expo-symbols";
@@ -12,9 +13,9 @@ import { useEffect, useRef, useState } from "react";
 import {
    ActivityIndicator,
    Alert,
-   Image as RNImage,
    Linking,
    Pressable,
+   Image as RNImage,
    StyleSheet,
    Text,
    View,
@@ -45,15 +46,12 @@ const isSimulator = !Device.isDevice;
  * Camera snapshots are written under `file://` temp paths. Remove them when the
  * user leaves review without persisting elsewhere (discard, done, or closing).
  */
-async function deleteCaptureFileFromDevice(uri: string | null | undefined): Promise<void> {
-   if (!uri || uri === devMockCaptureUri) {
-      return;
-   }
-   if (!uri.startsWith("file:")) {
-      return;
-   }
+function deleteCaptureFileFromDevice(uri: string | null | undefined) {
    try {
-      await FileSystem.deleteAsync(uri, { idempotent: true });
+      if (!uri || !uri.startsWith("file://")) return;
+
+      const file = new File(uri);
+      if (file.exists) file.delete();
    } catch {
       // Temp path may already be gone; avoid surfacing to the user.
    }
