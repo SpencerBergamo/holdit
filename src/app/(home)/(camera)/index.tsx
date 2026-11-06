@@ -4,10 +4,11 @@ import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import * as Device from "expo-device";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import * as Haptics from "expo-haptics";
+import * as FileSystem from "expo-file-system";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { SymbolView } from "expo-symbols";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
    ActivityIndicator,
    Alert,
@@ -39,6 +40,24 @@ const devMockCaptureUri = __DEV__
    : "";
 
 const isSimulator = !Device.isDevice;
+
+/**
+ * Camera snapshots are written under `file://` temp paths. Remove them when the
+ * user leaves review without persisting elsewhere (discard, done, or closing).
+ */
+async function deleteCaptureFileFromDevice(uri: string | null | undefined): Promise<void> {
+   if (!uri || uri === devMockCaptureUri) {
+      return;
+   }
+   if (!uri.startsWith("file:")) {
+      return;
+   }
+   try {
+      await FileSystem.deleteAsync(uri, { idempotent: true });
+   } catch {
+      // Temp path may already be gone; avoid surfacing to the user.
+   }
+}
 
 // ─── Glass button helper ────────────────────────────────────────────────────
 
@@ -117,7 +136,18 @@ export default function CameraScreen() {
    const [flashVisible, setFlashVisible] = useState(false);
    const [capturing, setCapturing] = useState(false);
    const cameraRef = useRef<CameraView>(null);
+   const capturedUriRef = useRef<string | null>(null);
    const insets = useSafeAreaInsets();
+
+   useEffect(() => {
+      capturedUriRef.current = captured?.uri ?? null;
+   }, [captured?.uri]);
+
+   useEffect(() => {
+      return () => {
+         void deleteCaptureFileFromDevice(capturedUriRef.current);
+      };
+   }, []);
 
    const shutterScale = useSharedValue(1);
    const shutterStyle = useAnimatedStyle(() => ({
@@ -259,12 +289,22 @@ export default function CameraScreen() {
 
    const handleDiscard = () => {
       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      setCaptured(null);
+      const uri = captured?.uri;
+      void (async () => {
+         await deleteCaptureFileFromDevice(uri);
+         setCaptured(null);
+      })();
    };
 
    const handleDone = () => {
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      router.back();
+      const uri = captured?.uri;
+      void (async () => {
+         await deleteCaptureFileFromDevice(uri);
+         void Haptics.notificationAsync(
+            Haptics.NotificationFeedbackType.Success,
+         );
+         router.back();
+      })();
    };
 
    // ── Review mode ────────────────────────────────────────────────────────────
