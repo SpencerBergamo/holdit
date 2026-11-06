@@ -9,10 +9,14 @@ import { router } from "expo-router";
 import { SymbolView } from "expo-symbols";
 import { useRef, useState } from "react";
 import {
+   ActivityIndicator,
+   Alert,
+   Image as RNImage,
+   Linking,
    Pressable,
    StyleSheet,
    Text,
-   View
+   View,
 } from "react-native";
 import Animated, {
    FadeIn,
@@ -27,6 +31,14 @@ import Animated, {
    withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const devMockCaptureUri = __DEV__
+   ? RNImage.resolveAssetSource(
+      require("../../../../assets/images/splash-icon.png"),
+   ).uri
+   : "";
+
+const isSimulator = !Device.isDevice;
 
 // ─── Glass button helper ────────────────────────────────────────────────────
 
@@ -103,33 +115,76 @@ export default function CameraScreen() {
    const [facing, setFacing] = useState<CameraType>("back");
    const [captured, setCaptured] = useState<CapturedPhoto | null>(null);
    const [flashVisible, setFlashVisible] = useState(false);
+   const [capturing, setCapturing] = useState(false);
    const cameraRef = useRef<CameraView>(null);
    const insets = useSafeAreaInsets();
 
-   // Shutter button scale pulse
    const shutterScale = useSharedValue(1);
    const shutterStyle = useAnimatedStyle(() => ({
       transform: [{ scale: shutterScale.value }],
    }));
 
-   // ── Permission gate ────────────────────────────────────────────────────────
+   const openSettings = () => {
+      void Linking.openSettings();
+   };
 
-   if (!permission) return <View style={styles.screen} />;
+   const promptSettings = () => {
+      Alert.alert(
+         "Camera is turned off",
+         "Allow camera access in Settings so HoldIt can capture products for your wishlists.",
+         [
+            { text: "Not now", style: "cancel" },
+            { text: "Open Settings", onPress: openSettings },
+         ],
+      );
+   };
+
+   // ── Permission gate ───────────────────────────────────────────────────────
+
+   if (!permission) {
+      return (
+         <View style={[styles.screen, styles.centered]}>
+            <ActivityIndicator size="large" color="#fff" />
+         </View>
+      );
+   }
 
    if (!permission.granted) {
+      const canAskAgain = permission.canAskAgain !== false;
       return (
          <View style={[styles.screen, styles.permissionContainer]}>
             <SymbolView name="camera" size={48} tintColor="white" />
             <Text style={styles.permissionTitle}>Camera access needed</Text>
             <Text style={styles.permissionBody}>
-               HoldIt needs the camera to capture product photos.
+               HoldIt uses the camera to snap items you want on your wishlists. We
+               only upload a photo when you save it to a list.
             </Text>
+            {canAskAgain ? (
+               <Pressable
+                  onPress={requestPermission}
+                  style={styles.permissionBtn}
+                  accessibilityRole="button"
+                  accessibilityLabel="Allow camera access"
+               >
+                  <Text style={styles.permissionBtnText}>Continue</Text>
+               </Pressable>
+            ) : (
+               <Pressable
+                  onPress={promptSettings}
+                  style={styles.permissionBtn}
+                  accessibilityRole="button"
+                  accessibilityLabel="Open Settings to allow camera"
+               >
+                  <Text style={styles.permissionBtnText}>Open Settings</Text>
+               </Pressable>
+            )}
             <Pressable
-               onPress={requestPermission}
-               style={styles.permissionBtn}
+               onPress={() => router.back()}
+               style={styles.permissionSecondary}
                accessibilityRole="button"
+               accessibilityLabel="Close"
             >
-               <Text style={styles.permissionBtnText}>Allow Camera</Text>
+               <Text style={styles.permissionSecondaryText}>Not now</Text>
             </Pressable>
          </View>
       );
@@ -138,8 +193,31 @@ export default function CameraScreen() {
    // ── Capture ────────────────────────────────────────────────────────────────
 
    const handleCapture = async () => {
-      if (!cameraRef.current) return;
+      if (capturing) {
+         return;
+      }
 
+      if (isSimulator && __DEV__) {
+         void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+         setFlashVisible(true);
+         setTimeout(() => setFlashVisible(false), 250);
+         setCaptured({ uri: devMockCaptureUri });
+         return;
+      }
+
+      if (isSimulator) {
+         Alert.alert(
+            "Camera not available",
+            "Use a physical device to take photos. Simulators don’t provide a live camera.",
+         );
+         return;
+      }
+
+      if (!cameraRef.current) {
+         return;
+      }
+
+      setCapturing(true);
       shutterScale.value = withSequence(
          withTiming(0.88, { duration: 80 }),
          withTiming(1, { duration: 120 }),
@@ -147,17 +225,35 @@ export default function CameraScreen() {
 
       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-      // Flash the screen white briefly like a shutter
       setFlashVisible(true);
       setTimeout(() => setFlashVisible(false), 250);
 
-      const photo = await cameraRef.current.takePictureAsync({ quality: 0.85 });
-      if (photo) {
-         setCaptured({ uri: photo.uri });
+      try {
+         const photo = await cameraRef.current.takePictureAsync({
+            quality: 0.85,
+         });
+         if (photo?.uri) {
+            setCaptured({ uri: photo.uri });
+         } else {
+            Alert.alert(
+               "Couldn’t take photo",
+               "Something went wrong. Try again or close and reopen the camera.",
+            );
+         }
+      } catch {
+         Alert.alert(
+            "Couldn’t take photo",
+            "The camera may still be starting. Try again in a moment.",
+         );
+      } finally {
+         setCapturing(false);
       }
    };
 
    const handleFlipCamera = () => {
+      if (isSimulator) {
+         return;
+      }
       void Haptics.selectionAsync();
       setFacing((f) => (f === "back" ? "front" : "back"));
    };
@@ -167,10 +263,15 @@ export default function CameraScreen() {
       setCaptured(null);
    };
 
-   const handleSave = () => {
+   const handleContinueToCollection = () => {
+      if (!captured?.uri) {
+         return;
+      }
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      // TODO: wire up to wishlist/product creation
-      router.back();
+      router.push({
+         pathname: "/(home)/(camera)/choose-collection",
+         params: { photoUri: captured.uri },
+      });
    };
 
    // ── Review mode ────────────────────────────────────────────────────────────
@@ -178,14 +279,12 @@ export default function CameraScreen() {
    if (captured) {
       return (
          <View style={styles.screen}>
-            {/* Frozen photo fill */}
             <Image
                source={{ uri: captured.uri }}
                style={StyleSheet.absoluteFill}
                contentFit="cover"
             />
 
-            {/* Top controls */}
             <Animated.View
                entering={FadeInDown.duration(280).springify()}
                exiting={FadeOutUp.duration(200)}
@@ -198,7 +297,6 @@ export default function CameraScreen() {
                />
             </Animated.View>
 
-            {/* Bottom controls */}
             <Animated.View
                entering={FadeInUp.duration(280).springify()}
                exiting={FadeOutDown.duration(200)}
@@ -213,24 +311,19 @@ export default function CameraScreen() {
                   onPress={handleDiscard}
                />
 
-               {/* Save CTA */}
                <Pressable
-                  onPress={handleSave}
+                  onPress={handleContinueToCollection}
                   accessibilityRole="button"
-                  accessibilityLabel="Add to wishlist"
+                  accessibilityLabel="Choose wishlist to save this photo"
                   style={({ pressed }) => [
                      styles.saveBtn,
                      { opacity: pressed ? 0.85 : 1 },
                   ]}
                >
-                  <Text style={styles.saveBtnText}>Add to wishlist</Text>
+                  <Text style={styles.saveBtnText}>Choose wishlist</Text>
                </Pressable>
 
-               <GlassButton
-                  icon={AvailableIcons.checkmark}
-                  label="Save to camera roll"
-                  onPress={() => { }}
-               />
+               <View style={styles.glassBtn} />
             </Animated.View>
          </View>
       );
@@ -240,7 +333,7 @@ export default function CameraScreen() {
 
    return (
       <View style={styles.screen}>
-         {Device.isDevice ? (
+         {!isSimulator ? (
             <CameraView
                ref={cameraRef}
                style={StyleSheet.absoluteFill}
@@ -248,12 +341,23 @@ export default function CameraScreen() {
                mirror={facing === "front"}
             />
          ) : (
-            <View style={{ flex: 1, backgroundColor: "grey" }} />
+            <View style={[StyleSheet.absoluteFill, styles.simulatorBackdrop]}>
+               <Text style={styles.simulatorTitle}>No live preview here</Text>
+               <Text style={styles.simulatorBody}>
+                  {__DEV__
+                     ? "Simulators don’t have a camera. Use “Take photo” below with a mock image to test saving, or run on a device."
+                     : "Use a physical device to capture products. Simulators don’t provide a camera."}
+               </Text>
+               {__DEV__ ? (
+                  <View style={styles.devPill}>
+                     <Text style={styles.devPillText}>Development build</Text>
+                  </View>
+               ) : null}
+            </View>
          )}
 
          <ShutterFlash visible={flashVisible} />
 
-         {/* Top controls */}
          <View style={[styles.topControls, { top: insets.top + 12 }]}>
             <GlassButton
                icon={AvailableIcons.close}
@@ -262,33 +366,36 @@ export default function CameraScreen() {
             />
          </View>
 
-         {/* Bottom controls */}
          <View
             style={[
                styles.bottomControls,
                { paddingBottom: insets.bottom + 24 },
             ]}
          >
-            {/* Flip camera */}
-            <GlassButton
-               icon={AvailableIcons.flip}
-               label="Flip camera"
-               onPress={handleFlipCamera}
-            />
+            <View style={isSimulator ? { opacity: 0.35 } : undefined}>
+               <GlassButton
+                  icon={AvailableIcons.flip}
+                  label="Flip camera"
+                  onPress={handleFlipCamera}
+               />
+            </View>
 
-            {/* Shutter */}
-            <Animated.View style={shutterStyle}>
+            <Animated.View style={[shutterStyle, capturing && { opacity: 0.6 }]}>
                <Pressable
-                  onPress={handleCapture}
+                  onPress={() => void handleCapture()}
+                  disabled={capturing}
                   accessibilityRole="button"
-                  accessibilityLabel="Take photo"
+                  accessibilityLabel={
+                     isSimulator && __DEV__
+                        ? "Use mock photo (development)"
+                        : "Take photo"
+                  }
                   style={styles.shutter}
                >
                   <View style={styles.shutterInner} />
                </Pressable>
             </Animated.View>
 
-            {/* Spacer to keep shutter centered */}
             <View style={styles.glassBtn} />
          </View>
       </View>
@@ -306,7 +413,41 @@ const styles = StyleSheet.create({
       flex: 1,
       backgroundColor: "#000",
    },
-   // ── Permission ─────────────────────────────────────────────────────────
+   centered: {
+      alignItems: "center",
+      justifyContent: "center",
+   },
+   simulatorBackdrop: {
+      backgroundColor: "#1a1a1a",
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 28,
+      gap: 12,
+   },
+   simulatorTitle: {
+      color: "#fff",
+      fontSize: 20,
+      fontWeight: "700",
+      textAlign: "center",
+   },
+   simulatorBody: {
+      color: "rgba(255,255,255,0.75)",
+      fontSize: 15,
+      lineHeight: 22,
+      textAlign: "center",
+   },
+   devPill: {
+      marginTop: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 999,
+      backgroundColor: "rgba(255,193,7,0.25)",
+   },
+   devPillText: {
+      color: "#ffc107",
+      fontSize: 13,
+      fontWeight: "600",
+   },
    permissionContainer: {
       alignItems: "center",
       justifyContent: "center",
@@ -338,7 +479,16 @@ const styles = StyleSheet.create({
       fontWeight: "600",
       color: "#000",
    },
-   // ── Viewfinder ─────────────────────────────────────────────────────────
+   permissionSecondary: {
+      marginTop: 16,
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+   },
+   permissionSecondaryText: {
+      color: "rgba(255,255,255,0.85)",
+      fontSize: 16,
+      fontWeight: "500",
+   },
    topControls: {
       position: "absolute",
       left: 16,
@@ -380,7 +530,6 @@ const styles = StyleSheet.create({
       alignItems: "center",
       justifyContent: "center",
    },
-   // ── Review ─────────────────────────────────────────────────────────────
    reviewTop: {
       position: "absolute",
       left: 16,

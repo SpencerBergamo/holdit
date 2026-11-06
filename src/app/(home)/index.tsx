@@ -181,6 +181,14 @@ export default function HomeScreen() {
          <Stack.Toolbar placement="right">
             <Stack.Toolbar.Button icon="tray" onPress={() => { }} />
             <Stack.Toolbar.Button
+               icon="camera.fill"
+               onPress={() =>
+                  router.push({
+                     pathname: "/(home)/(camera)",
+                  })
+               }
+            />
+            <Stack.Toolbar.Button
                icon="person.circle"
                onPress={() => router.push("/(home)/(profile)")}
             />
